@@ -18,7 +18,7 @@ scope or the acceptance criteria are incomplete — say which.
 
 ## Context
 
-!`wizrelay brief --phase plan --session "${CLAUDE_SESSION_ID:-}"`
+!`wizrelay brief --phase plan`
 
 If the line above begins with `NO_INIT` or `NO_ACTIVE_TASK`, stop and say which command
 the user needs. If it begins with `WIZRELAY_NO_GUARD`, tell the user that scope protection

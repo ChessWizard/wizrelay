@@ -728,7 +728,8 @@ def cmd_brief(args: argparse.Namespace) -> int:
             return EXIT_OK
         state = context_mod.load_dev_state(ctx)
         t = _translator_for(state.config, args.lang)
-        _out(context_mod.brief(state, t, phase=args.phase, session_id=args.session))
+        session = args.session or os.environ.get("CLAUDE_CODE_SESSION_ID") or None
+        _out(context_mod.brief(state, t, phase=args.phase, session_id=session))
     except Exception as exc:
         _out(f"{context_mod.SENTINEL_ERROR} {exc}")
     return EXIT_OK
@@ -1788,7 +1789,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_brief.add_argument(
         "--session",
         metavar="ID",
-        help="Session id, so the guard heartbeat can be checked (invariant I13).",
+        help=(
+            "Session id, so the guard heartbeat can be checked (invariant I13). "
+            "Defaults to CLAUDE_CODE_SESSION_ID, which Claude Code sets in the "
+            "subprocess a skill's command span runs in."
+        ),
     )
     p_brief.set_defaults(func=cmd_brief)
 

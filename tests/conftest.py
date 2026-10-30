@@ -36,6 +36,10 @@ def isolate_environment(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None
     monkeypatch.delenv("WIZRELAY_DEBUG", raising=False)
     monkeypatch.delenv("WIZRELAY_PYTHON", raising=False)
     monkeypatch.delenv("WIZRELAY_TRACKERS_DIR", raising=False)
+    # Claude Code sets this in every subprocess it spawns, so a suite run from inside a
+    # session would otherwise inherit a real session id and check a heartbeat that was
+    # never written. A test must not depend on what launched it.
+    monkeypatch.delenv("CLAUDE_CODE_SESSION_ID", raising=False)
     # Deterministic git, and no dependency on the developer's own identity.
     monkeypatch.setenv("GIT_AUTHOR_NAME", "wizrelay-test")
     monkeypatch.setenv("GIT_AUTHOR_EMAIL", "test@example.invalid")

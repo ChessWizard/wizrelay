@@ -25,7 +25,7 @@ printed. A criterion with no evidence is `NOT VERIFIED`, never `PASS`.
 
 ## Context
 
-!`wizrelay brief --phase verify --session "${CLAUDE_SESSION_ID:-}"`
+!`wizrelay brief --phase verify`
 
 ## Scope audit
 

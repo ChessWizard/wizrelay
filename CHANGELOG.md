@@ -50,7 +50,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   All of them are now `wizrelay`, so the install id is `wizrelay@wizrelay`. The manifest name did not change, so `/wizrelay:` commands, `.wizrelay/`,
   `wizrelay-hub.json` and the `[WIZRELAY-*]` tracker tags are untouched.
 
+### Added
+
+- `plugin/.claude-plugin/icon.png`: a 1024 x 1024 listing icon, the relay the product is
+  named after drawn as a hub with three lines leaving it.
+
 ### Fixed
+
+- The session id three skills passed was never set. They expanded `${CLAUDE_SESSION_ID:-}`,
+  but the variable Claude Code sets is `CLAUDE_CODE_SESSION_ID`, so the spans sent an empty
+  string and the heartbeat behind invariant I13 was never checked. `wizrelay brief` now
+  reads the variable itself and the spans are fixed literals, which also stops a security
+  scan reading them as commands assembled at run time. `tests/conftest.py` clears the
+  variable, because a suite run from inside a Claude Code session was otherwise inheriting a
+  real session id.
 
 - Two tests assumed the machine they run on. `test_stdlib_only.py` used
   `sys.stdlib_module_names`, which arrived in Python 3.10 while the floor here is 3.9. The

@@ -482,8 +482,8 @@ def test_brief_is_quiet_when_the_heartbeat_exists(dev_repo: Path, run_cli) -> No
 
 
 def test_brief_with_an_empty_session_id_does_not_warn(dev_repo: Path, run_cli) -> None:
-    # The skills pass `${CLAUDE_SESSION_ID:-}`, which is empty when the variable is unset.
-    # A false guard warning on every invocation would be worse than no warning at all.
+    # An empty id means the caller could not supply one. A false guard warning on every
+    # invocation would be worse than no warning at all.
     run_cli("pull", TASK_ID, cwd=dev_repo)
     code, out, _err = run_cli("brief", "--session", "", cwd=dev_repo)
     assert code == 0

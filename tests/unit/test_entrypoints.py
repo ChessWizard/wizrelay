@@ -141,3 +141,35 @@ def test_the_bundled_library_wins_over_an_installed_one(tmp_path: Path) -> None:
     )
     assert result.returncode == 0, result.stderr
     assert "impostor" not in result.stdout, "an installed copy shadowed the bundled one"
+
+
+def test_no_skill_span_assembles_its_command_at_run_time() -> None:
+    """A skill's `!`…`` span must be a fixed literal.
+
+    Two reasons. A shell expansion inside a span is read by the directory's security scan
+    as a command built at run time, which it holds for review. And the expansion that was
+    here referred to `CLAUDE_SESSION_ID`, which does not exist — the variable Claude Code
+    sets is `CLAUDE_CODE_SESSION_ID` — so it silently passed an empty string for months.
+    Anything the command needs from the environment is read by the CLI itself.
+    """
+    offenders: list[str] = []
+    for skill in sorted((PLUGIN / "skills").iterdir()):
+        body = (skill / "SKILL.md").read_text(encoding="utf-8")
+        for line in body.splitlines():
+            stripped = line.strip()
+            if not stripped.startswith("!`"):
+                continue
+            if "$" in stripped or "`$(" in stripped:
+                offenders.append(f"{skill.name}: {stripped}")
+    assert not offenders, "a command span must not expand a variable: " + "; ".join(offenders)
+
+
+def test_the_session_id_variable_is_the_one_claude_code_sets() -> None:
+    """`CLAUDE_SESSION_ID` is not a Claude Code variable; `CLAUDE_CODE_SESSION_ID` is."""
+    for path in sorted((PLUGIN).rglob("*")):
+        if not path.is_file() or path.suffix not in {".py", ".md", ".json"}:
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        assert "CLAUDE_SESSION_ID" not in text.replace("CLAUDE_CODE_SESSION_ID", ""), (
+            f"{path.relative_to(PLUGIN)} uses CLAUDE_SESSION_ID, which is never set"
+        )

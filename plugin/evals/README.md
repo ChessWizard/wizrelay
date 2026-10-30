@@ -9,10 +9,10 @@ behaviour, and only an eval measures it.
 
 ## Why these cases are here and not in `tests/evals/`
 
-An eval directory has to live **below the plugin root**: the default is `evals/` inside the plugin, and the `experimental.evals`
-manifest key can only name another directory under the same root
-. `tests/evals/` is a sibling of `plugin/`, so it
-cannot be the eval directory. The suite therefore lives here.
+An eval directory has to live **below the plugin root**: the default is `evals/` inside
+the plugin, and the `experimental.evals` manifest key can only name another directory
+under the same root. `tests/evals/` is a sibling of `plugin/`, so it cannot be the eval
+directory. The suite therefore lives here.
 
 ## Run it
 
