@@ -50,4 +50,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   All of them are now `wizrelay`, so the install id is `wizrelay@wizrelay`. The manifest name did not change, so `/wizrelay:` commands, `.wizrelay/`,
   `wizrelay-hub.json` and the `[WIZRELAY-*]` tracker tags are untouched.
 
+### Fixed
+
+- `plugin/bin/wizrelay.py` no longer shadows the package it imports. A script's own
+  directory comes first on `sys.path`, and that directory holds `wizrelay.py`, so
+  `import wizrelay` could resolve to the launcher instead of the bundled package and fail
+  with `'wizrelay' is not a package`. The launcher now drops its own directory and inserts
+  `plugin/lib` unconditionally rather than only when it is absent — a path already present
+  further down does not give the bundled copy precedence. This also makes the guarantee
+  the launcher documents true in every case: the bundled library wins over an installed
+  `wizrelay`, so the hook contract always matches the plugin's own version.
+
 [Unreleased]: https://github.com/ChessWizard/wizrelay/compare/v0.0.0...HEAD

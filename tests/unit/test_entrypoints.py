@@ -94,3 +94,50 @@ def test_the_path_launcher_actually_runs() -> None:
     )
     assert result.returncode == 0, result.stderr
     assert "wizrelay" in result.stdout
+
+
+@pytest.mark.parametrize("launcher", ["wizrelay.py", "wizrelay"])
+def test_the_launcher_survives_the_library_already_being_on_the_path(launcher: str) -> None:
+    """An editable install puts `plugin/lib` on `sys.path` before the launcher runs.
+
+    The launcher's own directory holds a `wizrelay.py`, and a script's directory comes
+    first on `sys.path`. If the launcher only inserted the library when it was absent, this
+    is the case where it would skip the insert and `import wizrelay` would find the
+    launcher instead of the package, failing with `'wizrelay' is not a package`.
+    """
+    if launcher == "wizrelay" and sys.platform == "win32":
+        pytest.skip("the sh launcher needs a POSIX shell")
+    target = PLUGIN / "bin" / launcher
+    command = [sys.executable, str(target)] if launcher.endswith(".py") else [str(target)]
+    result = subprocess.run(
+        [*command, "--version"],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        shell=False,
+        check=False,
+        env={**os.environ, "PYTHONPATH": str(PLUGIN / "lib")},
+    )
+    assert result.returncode == 0, result.stderr
+    assert "wizrelay" in result.stdout
+
+
+def test_the_bundled_library_wins_over_an_installed_one(tmp_path: Path) -> None:
+    """The bundled copy has to win: its version is the one the hook contract matches."""
+    impostor = tmp_path / "wizrelay"
+    impostor.mkdir()
+    (impostor / "__init__.py").write_text("", encoding="utf-8")
+    (impostor / "cli.py").write_text(
+        'def main(argv=None):\n    print("impostor")\n    return 0\n', encoding="utf-8"
+    )
+    result = subprocess.run(
+        [sys.executable, str(PLUGIN / "bin" / "wizrelay.py"), "--version"],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        shell=False,
+        check=False,
+        env={**os.environ, "PYTHONPATH": str(tmp_path)},
+    )
+    assert result.returncode == 0, result.stderr
+    assert "impostor" not in result.stdout, "an installed copy shadowed the bundled one"
