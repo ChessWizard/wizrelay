@@ -2,7 +2,7 @@
 [English](README.md) &nbsp;·&nbsp; **Türkçe**
 <!-- /lang -->
 
-# wizrelay
+# <img src="plugin/.claude-plugin/icon.png" alt="" width="34" align="top"> wizrelay
 
 Researcher'ın task analizini tek bir doğruluk kaynağından her developer'ın Claude Code
 oturumuna taşır — deterministik olarak.

@@ -1,4 +1,4 @@
-# wizrelay
+# <img src=".claude-plugin/icon.png" alt="" width="34" align="top"> wizrelay
 
 Carries a researcher's task analysis into every Claude Code session: deterministic context,
 layered scope protection, model and effort routing, and developer-side verification.
