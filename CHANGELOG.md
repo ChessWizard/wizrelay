@@ -53,12 +53,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Two tests assumed the machine they run on. `test_stdlib_only.py` used
-  `sys.stdlib_module_names`, which arrived in Python 3.10 while the floor here is 3.9, so
-  every 3.9 job failed; it now derives the same set from `sysconfig` and
-  `sys.builtin_module_names` when the attribute is absent, and a new test exercises that
-  branch on every version rather than only on 3.9. `test_hubrepo.py` set `HOME` to check
-  that `~` expands, but on Windows `expanduser` reads `USERPROFILE` and never looks at
-  `HOME`, so the path resolved to the runner's real home; it now sets both.
+  `sys.stdlib_module_names`, which arrived in Python 3.10 while the floor here is 3.9. The
+  3.9 fallback now asks the import system where a module resolves instead of listing the
+  standard library directory: on POSIX an extension module such as `unicodedata` sits in
+  `lib-dynload` under that directory, but on Windows it sits in `DLLs`, outside every path
+  `sysconfig` reports. Three tests cover the fallback on every Python version — that it
+  accepts each import the runtime makes, that it still rejects an installed package, and
+  that it does not read the standard library directory at all. `test_hubrepo.py` set `HOME`
+  to check that `~` expands, but on Windows `expanduser` reads `USERPROFILE` and never
+  looks at `HOME`, so the path resolved to the runner's real home; it now sets both.
 - `plugin/bin/wizrelay.py` no longer shadows the package it imports. A script's own
   directory comes first on `sys.path`, and that directory holds `wizrelay.py`, so
   `import wizrelay` could resolve to the launcher instead of the bundled package and fail

@@ -8,9 +8,12 @@ plugin: Claude Code copies the directory and runs it.
 from __future__ import annotations
 
 import ast
+import importlib.util
+import os
 import sys
 import sysconfig
 from pathlib import Path
+from typing import Optional
 
 import pytest
 
@@ -27,69 +30,109 @@ def _absolute_imports(tree: ast.Module) -> set[str]:
     return found
 
 
-def _stdlib_names() -> set[str]:
-    """The top-level module names the standard library provides.
+def _under(path: str, root: Optional[str]) -> bool:
+    """True when `path` sits inside `root`, comparing the way the platform does."""
+    if not root:
+        return False
+    prefix = os.path.normcase(os.path.realpath(root)) + os.sep
+    return os.path.normcase(os.path.realpath(path)).startswith(prefix)
 
-    `sys.stdlib_module_names` arrived in 3.10 and the floor here is 3.9, so on 3.9 the set
-    is derived instead: the interpreter's built-ins, plus every top-level module and
-    package that lives in the standard library directory. Both branches run in CI, because
-    the matrix covers 3.9 as well as 3.12 and 3.13.
+
+def _is_stdlib(name: str) -> bool:
+    """Whether a top-level module name belongs to the standard library.
+
+    `sys.stdlib_module_names` arrived in 3.10 and the floor here is 3.9, so on 3.9 the
+    answer is worked out from where the module actually resolves. Asking the import system
+    rather than listing a directory is what makes this portable: on POSIX an extension
+    module such as `unicodedata` lives in `lib-dynload` under the stdlib directory, while
+    on Windows it lives in `DLLs`, which is a sibling of `Lib` and outside every path
+    `sysconfig` reports. Both are under `sys.base_prefix`, and site-packages is ruled out
+    first because on some layouts it sits inside the stdlib directory.
     """
     names = getattr(sys, "stdlib_module_names", None)
     if names is not None:
-        return set(names)
+        return name in names
 
-    found = set(sys.builtin_module_names)
-    for key in ("stdlib", "platstdlib"):
-        root = sysconfig.get_paths().get(key)
-        if not root:
-            continue
-        directory = Path(root)
-        if not directory.is_dir():
-            continue
-        for entry in directory.iterdir():
-            if entry.suffix == ".py":
-                found.add(entry.stem)
-            elif entry.is_dir() and (entry / "__init__.py").exists():
-                found.add(entry.name)
-        # Extension modules are not importable as files: `_socket`, `math` and friends.
-        dynload = directory / "lib-dynload"
-        if dynload.is_dir():
-            found.update(entry.name.split(".")[0] for entry in dynload.iterdir())
-    return found
+    if name in sys.builtin_module_names:
+        return True
+    try:
+        spec = importlib.util.find_spec(name)
+    except (ImportError, ValueError):
+        return False
+    if spec is None:
+        return False
+    origin = spec.origin
+    if origin in (None, "built-in", "frozen"):
+        return True
+    paths = sysconfig.get_paths()
+    if any(_under(origin, paths.get(key)) for key in ("purelib", "platlib")):
+        return False
+    return any(_under(origin, root) for root in (sys.base_prefix, sys.prefix))
 
 
 def test_no_third_party_import_in_the_runtime() -> None:
-    stdlib = _stdlib_names()
     offenders: list[str] = []
     for path in sorted(PACKAGE.rglob("*.py")):
         for imported in _absolute_imports(ast.parse(path.read_text(encoding="utf-8"))):
             top = imported.split(".")[0]
-            if top and top not in stdlib and top != "wizrelay":
+            if top and top != "wizrelay" and not _is_stdlib(top):
                 offenders.append(f"{path.relative_to(PACKAGE)} imports {imported}")
     assert not offenders, "the runtime must be stdlib-only: " + "; ".join(offenders)
 
 
-def test_the_derived_stdlib_set_covers_what_the_runtime_imports(
+def _runtime_imports() -> set[str]:
+    found: set[str] = set()
+    for path in sorted(PACKAGE.rglob("*.py")):
+        for name in _absolute_imports(ast.parse(path.read_text(encoding="utf-8"))):
+            found.add(name.split(".")[0])
+    found.discard("wizrelay")
+    return found
+
+
+def test_the_fallback_classifies_every_runtime_import_as_stdlib(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Exercise the 3.9 branch on every version, so it cannot rot unnoticed.
 
-    Only 3.9 takes it in CI. Without this test a mistake in the fallback would surface as
-    a red 3.9 job months later, and only on that one row of the matrix.
+    Only 3.9 takes it in CI. Without this test a mistake in the fallback would surface as a
+    red 3.9 job months later, on one row of the matrix and one operating system — which is
+    exactly how the `lib-dynload` version of this check reached Windows before it was
+    caught.
     """
     monkeypatch.delattr(sys, "stdlib_module_names", raising=False)
-    derived = _stdlib_names()
-
-    imported: set[str] = set()
-    for path in sorted(PACKAGE.rglob("*.py")):
-        for name in _absolute_imports(ast.parse(path.read_text(encoding="utf-8"))):
-            imported.add(name.split(".")[0])
-    imported.discard("wizrelay")
-
+    imported = _runtime_imports()
     assert imported, "the runtime imports nothing, which cannot be right"
-    missing = sorted(name for name in imported if name not in derived)
-    assert not missing, f"the derived set would wrongly flag: {missing}"
+    wrong = sorted(name for name in imported if not _is_stdlib(name))
+    assert not wrong, f"the fallback would wrongly flag: {wrong}"
+
+
+def test_the_fallback_does_not_depend_on_the_stdlib_directory(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The Windows failure in one sentence, locked so it cannot come back.
+
+    `unicodedata` is an extension module. On POSIX it sits in `lib-dynload` under the
+    directory `sysconfig` calls `stdlib`; on Windows it sits in `DLLs`, outside every path
+    `sysconfig` reports. A check that reads those paths therefore passes on three platforms
+    and fails on the fourth. Blanking them here proves this one does not read them.
+    """
+    monkeypatch.delattr(sys, "stdlib_module_names", raising=False)
+    real = sysconfig.get_paths()
+    blanked = dict(real, stdlib="/nowhere/stdlib", platstdlib="/nowhere/platstdlib")
+    monkeypatch.setattr(sysconfig, "get_paths", lambda *a, **k: blanked)
+
+    assert _is_stdlib("unicodedata"), "an extension module must still count as stdlib"
+    assert _is_stdlib("json"), "a pure-Python stdlib module must still count as stdlib"
+    assert not _is_stdlib("pytest"), "site-packages must still be ruled out"
+
+
+def test_the_fallback_still_rejects_a_third_party_package(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A fallback that answers "stdlib" to everything would pass the test above silently."""
+    monkeypatch.delattr(sys, "stdlib_module_names", raising=False)
+    assert not _is_stdlib("pytest"), "an installed package must not count as stdlib"
+    assert not _is_stdlib("a_package_that_does_not_exist_anywhere")
 
 
 def test_the_distribution_declares_no_runtime_dependencies() -> None:
