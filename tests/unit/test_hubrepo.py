@@ -77,7 +77,11 @@ def test_a_credential_url_is_rejected() -> None:
 def test_a_home_relative_hub_path_is_expanded(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    # `expanduser` reads HOME on POSIX and USERPROFILE on Windows, where HOME is never
+    # consulted. Setting only one of them makes this test pass on three platforms and
+    # resolve to the real home directory on the fourth.
     monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))
     hub = tmp_path / "myhub"
     hub.mkdir()
     (hub / paths.HUB_MARKER).write_text("{}", encoding="utf-8")

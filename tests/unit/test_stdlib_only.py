@@ -9,7 +9,10 @@ from __future__ import annotations
 
 import ast
 import sys
+import sysconfig
 from pathlib import Path
+
+import pytest
 
 PACKAGE = Path(__file__).resolve().parent.parent.parent / "plugin" / "lib" / "wizrelay"
 
@@ -24,8 +27,40 @@ def _absolute_imports(tree: ast.Module) -> set[str]:
     return found
 
 
+def _stdlib_names() -> set[str]:
+    """The top-level module names the standard library provides.
+
+    `sys.stdlib_module_names` arrived in 3.10 and the floor here is 3.9, so on 3.9 the set
+    is derived instead: the interpreter's built-ins, plus every top-level module and
+    package that lives in the standard library directory. Both branches run in CI, because
+    the matrix covers 3.9 as well as 3.12 and 3.13.
+    """
+    names = getattr(sys, "stdlib_module_names", None)
+    if names is not None:
+        return set(names)
+
+    found = set(sys.builtin_module_names)
+    for key in ("stdlib", "platstdlib"):
+        root = sysconfig.get_paths().get(key)
+        if not root:
+            continue
+        directory = Path(root)
+        if not directory.is_dir():
+            continue
+        for entry in directory.iterdir():
+            if entry.suffix == ".py":
+                found.add(entry.stem)
+            elif entry.is_dir() and (entry / "__init__.py").exists():
+                found.add(entry.name)
+        # Extension modules are not importable as files: `_socket`, `math` and friends.
+        dynload = directory / "lib-dynload"
+        if dynload.is_dir():
+            found.update(entry.name.split(".")[0] for entry in dynload.iterdir())
+    return found
+
+
 def test_no_third_party_import_in_the_runtime() -> None:
-    stdlib = set(sys.stdlib_module_names)
+    stdlib = _stdlib_names()
     offenders: list[str] = []
     for path in sorted(PACKAGE.rglob("*.py")):
         for imported in _absolute_imports(ast.parse(path.read_text(encoding="utf-8"))):
@@ -33,6 +68,28 @@ def test_no_third_party_import_in_the_runtime() -> None:
             if top and top not in stdlib and top != "wizrelay":
                 offenders.append(f"{path.relative_to(PACKAGE)} imports {imported}")
     assert not offenders, "the runtime must be stdlib-only: " + "; ".join(offenders)
+
+
+def test_the_derived_stdlib_set_covers_what_the_runtime_imports(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Exercise the 3.9 branch on every version, so it cannot rot unnoticed.
+
+    Only 3.9 takes it in CI. Without this test a mistake in the fallback would surface as
+    a red 3.9 job months later, and only on that one row of the matrix.
+    """
+    monkeypatch.delattr(sys, "stdlib_module_names", raising=False)
+    derived = _stdlib_names()
+
+    imported: set[str] = set()
+    for path in sorted(PACKAGE.rglob("*.py")):
+        for name in _absolute_imports(ast.parse(path.read_text(encoding="utf-8"))):
+            imported.add(name.split(".")[0])
+    imported.discard("wizrelay")
+
+    assert imported, "the runtime imports nothing, which cannot be right"
+    missing = sorted(name for name in imported if name not in derived)
+    assert not missing, f"the derived set would wrongly flag: {missing}"
 
 
 def test_the_distribution_declares_no_runtime_dependencies() -> None:
