@@ -151,6 +151,11 @@ başına hesaplanıyor. Bkz. [examples/README.md](examples/README.md).
 Yayın öncesi. Neyin tamamlandığı [CHANGELOG.md](CHANGELOG.md)'de. Uygulama planı bu
 reponun dışında tutuluyor.
 
+## Gizlilik
+
+Hiçbir servis, hiçbir telemetri yok; makineden çıkan tek şey senin yapılandırdığın repo ve
+tracker'a gidiyor. Tam metin: [PRIVACY.md](PRIVACY.md) (İngilizce).
+
 ## Güvenlik
 
 wizrelay bir **korkuluk, hapishane değil**. Her katmanın neyi durdurduğu ve

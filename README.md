@@ -153,6 +153,11 @@ computed per role. See [examples/README.md](examples/README.md).
 Pre-release. What has landed is in [CHANGELOG.md](CHANGELOG.md). The implementation plan
 is maintained outside this repository.
 
+## Privacy
+
+No service, no telemetry, nothing leaves your machine except to the repository and the
+tracker you configured yourself. [PRIVACY.md](PRIVACY.md) is the full statement.
+
 ## Security
 
 wizrelay is a **guardrail, not a jail**. Read

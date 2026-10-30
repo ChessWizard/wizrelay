@@ -80,6 +80,40 @@ Claude Code only: the terminal, the desktop app's local and SSH sessions, and th
 and JetBrains extensions. This plugin ships a top-level `bin/` directory for its launchers,
 which claude.ai and Cowork refuse to install, and cloud sessions load no plugins at all.
 
+## What it reads, writes and sends
+
+The full statement is
+[PRIVACY.md](https://github.com/ChessWizard/wizrelay/blob/main/PRIVACY.md); the short
+version:
+
+There is no wizrelay service. The plugin has no backend, no telemetry and no endpoint of
+its own: it ships no HTTP client at all, and nothing is ever sent to its author.
+
+| Destination | What goes there | When |
+|---|---|---|
+| Your hub repository | `git clone`, `git fetch` to read packages; `git push` when the researcher publishes | On `pull`, `sync` and `hub-publish` |
+| Your issue tracker | Four comment types: the published package, a developer's question, the researcher's answer, a verification report | Only on `/wizrelay:ask`, `/wizrelay:verify` and `/wizrelay:hub-publish`, and only after you approve the exact text |
+| Nothing else | — | — |
+
+Both destinations are services **you** configure: the hub is the git URL in
+`.wizrelay/config.json`, and the tracker is reached through the MCP connector you connect
+or through your own `gh` CLI. The plugin declares no connector of its own. `wizrelay init
+--tracker clickup` can add ClickUp's published MCP endpoint to your project's `.mcp.json`;
+for every other tracker it writes no endpoint and prints instructions instead, because a
+guessed endpoint can point credentials at the wrong host.
+
+On your machine it reads `.wizrelay/`, the task package, and `git status`, `git diff` and
+the current branch. It never reads git author names or email addresses, and never reads a
+credential, a token or an environment variable other than its own `WIZRELAY_*` settings,
+`XDG_CACHE_HOME`, `LOCALAPPDATA`, `CLAUDE_PLUGIN_DATA` and `CLAUDE_CODE_SESSION_ID`.
+
+It writes `.wizrelay/` in your repository and a cache under your own cache directory. The
+lock file records the task identifier, title, version, the hub commit and file hashes — no
+personal data.
+
+Where a tracker task carries a person's name, that text reaches the session like any other
+task content, and the researcher's package is stored in your team's own repository.
+
 ## Security
 
 The plugin holds no team's content. Tracker comments and package text are treated as data,
