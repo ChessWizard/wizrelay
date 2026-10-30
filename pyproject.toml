@@ -1,0 +1,168 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wizrelay"
+# Single source of truth is plugin/.claude-plugin/plugin.json; tests/unit/test_version.py
+# asserts the three values agree.
+version = "0.1.0"
+description = "Carry a researcher's task analysis into every Claude Code session, deterministically."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "wizrelay contributors" }]
+keywords = ["claude-code", "plugin", "research", "scope", "ai-native"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+]
+# Runtime dependencies are deliberately empty: the runtime is stdlib-only.
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.6",
+    "mypy>=1.11",
+    # Only the test suite imports this: it validates the JSON Schema files in `schemas/`
+    # against the same fixtures the stdlib validator sees, so the two implementations
+    # cannot drift. The runtime never imports it.
+    "jsonschema>=4.21",
+]
+
+[project.scripts]
+wizrelay = "wizrelay.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/ChessWizard/wizrelay"
+Repository = "https://github.com/ChessWizard/wizrelay"
+Changelog = "https://github.com/ChessWizard/wizrelay/blob/main/CHANGELOG.md"
+
+[tool.setuptools]
+# The package lives inside the plugin so that one directory is both a Claude Code plugin
+# and an installable Python distribution.
+package-dir = { "" = "plugin/lib" }
+
+[tool.setuptools.packages.find]
+where = ["plugin/lib"]
+include = ["wizrelay*"]
+
+[tool.setuptools.package-data]
+wizrelay = ["i18n/*.json"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+addopts = "-q --strict-markers --strict-config"
+markers = [
+    "slow: a test that takes more than a second",
+    "perf: a performance budget test",
+]
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["wizrelay"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+src = ["plugin/lib", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # bugbear
+    "UP",   # pyupgrade
+    "S",    # bandit subset
+    "C4",   # comprehensions
+    "RUF",  # ruff-specific
+]
+ignore = [
+    "S101",  # `assert` is how pytest works
+    # PEP 604 unions (`X | Y`) are evaluated at runtime in some positions and need 3.10.
+    # The floor is Python 3.9, so these two stay as `Union` and `Optional`.
+    # PEP 585 builtin generics (`list[x]`) are fine on 3.9 and are used throughout.
+    "UP007",
+    "UP045",
+    # The user-facing strings in this project are bilingual by design, and the Turkish
+    # alphabet contains characters ruff reads as "ambiguous" next to their ASCII
+    # lookalikes (ı/i, ş/s, ğ/g). Flagging every one of them would mean either dropping
+    # the diacritics or suppressing the rule on hundreds of lines.
+    "RUF001",
+    "RUF002",
+    "RUF003",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests may use subprocess freely and touch temporary paths.
+"tests/**" = ["S603", "S607", "S108", "B011"]
+# This script holds the documentation's markdown tables as literals. A markdown table row
+# cannot be wrapped — a newline inside one ends the row — so the line length rule here
+# would mean either breaking the tables or a `noqa` on every row of them.
+"scripts/docs_nav.py" = ["E501"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+# Recent mypy releases dropped `python_version = "3.9"`, so the type checker runs against
+# 3.10 semantics. The 3.9 floor is guaranteed by two other things
+# instead, both stronger than a type checker's target setting:
+#   * the CI test matrix runs the whole suite on 3.9, so code that cannot even import
+#     there fails every test
+#   * tests/unit/test_stdlib_only.py rejects the 3.10-only syntax that `from __future__
+#     import annotations` does not rescue
+python_version = "3.10"
+mypy_path = "plugin/lib"
+packages = ["wizrelay"]
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_reexport = true
+show_error_codes = true
+
+# The core is strict: these modules are pure and fully annotated.
+[[tool.mypy.overrides]]
+module = [
+    "wizrelay.globs",
+    "wizrelay.textformats",
+    "wizrelay.schemas",
+    "wizrelay.routing",
+    "wizrelay.lock",
+    "wizrelay.i18n",
+    "wizrelay.config",
+    "wizrelay.trackers",
+]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_any_generics = true
+strict_equality = true
+no_implicit_optional = true
+warn_return_any = true

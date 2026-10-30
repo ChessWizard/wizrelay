@@ -1,0 +1,34 @@
+#!/bin/sh
+# `wizrelay` as a bare command.
+#
+# Files in a plugin's bin/ directory are placed on the Bash tool's PATH while the plugin
+# is enabled, so skills and the user can run
+# `wizrelay ...` with nothing installed.
+#
+# Hooks do NOT use this script: exec form needs a real executable, and on Windows a
+# shebang script is not one. They run `python3 bin/wizrelay.py` instead.
+#
+# Interpreter search order:
+#   1. $WIZRELAY_PYTHON  - an explicit override, which is the escape hatch on a machine
+#                          where `python3` is absent or is the wrong version
+#   2. python3           - the normal case on macOS, Linux and Git Bash
+#   3. python            - Windows installs that ship only `python.exe`
+set -eu
+
+SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+PLUGIN_ROOT=$(dirname -- "$SCRIPT_DIR")
+
+if [ -n "${WIZRELAY_PYTHON:-}" ]; then
+    PY="$WIZRELAY_PYTHON"
+elif command -v python3 >/dev/null 2>&1; then
+    PY=python3
+elif command -v python >/dev/null 2>&1; then
+    PY=python
+else
+    echo "wizrelay: no Python interpreter found." >&2
+    echo "  Why: wizrelay needs Python 3.9 or newer, and neither python3 nor python is on PATH." >&2
+    echo "  Fix: install Python 3.9+, or set WIZRELAY_PYTHON to the interpreter's path." >&2
+    exit 2
+fi
+
+exec "$PY" "$PLUGIN_ROOT/bin/wizrelay.py" "$@"

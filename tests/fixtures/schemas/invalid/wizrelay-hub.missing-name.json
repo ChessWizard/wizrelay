@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "language": "tr",
+  "tracker": {
+    "type": "clickup",
+    "id_prefix": "CU-"
+  },
+  "roles": [
+    "backend",
+    "frontend"
+  ],
+  "default_branch": "main",
+  "base_ref": "origin/main",
+  "default_enforcement": "strict",
+  "researcher_mention": "@researcher"
+}

@@ -1,0 +1,6 @@
+{
+  "decision": "ask",
+  "reason_contains": [
+    "weaker model"
+  ]
+}

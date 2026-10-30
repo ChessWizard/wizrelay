@@ -1,0 +1,12 @@
+{
+  "contains": [
+    "Active research package",
+    "No task package is active",
+    "role is backend"
+  ],
+  "absent_keys": [
+    "sessionTitle",
+    "systemMessage"
+  ],
+  "max_chars": 8000
+}

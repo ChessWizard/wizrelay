@@ -1,0 +1,7 @@
+{
+  "decision": "deny",
+  "reason_contains": [
+    "belongs to the researcher",
+    "/wizrelay:ask"
+  ]
+}

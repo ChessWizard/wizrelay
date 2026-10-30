@@ -1,0 +1,18 @@
+{
+  "type": "clickup",
+  "display_name": "ClickUp",
+  "level": "full",
+  "ref_pattern": "^(?:CU-)?([0-9a-z]{6,12})$",
+  "canonical_id": "CU-{ref}",
+  "url_template": "https://app.clickup.com/t/{ref}",
+  "required_config": [],
+  "mcp": {
+    "name": "clickup",
+    "type": "http",
+    "url": "https://mcp.clickup.com/mcp",
+    "auth": "oauth",
+    "verified": true,
+    "source": "https://developer.clickup.com/docs/connect-an-ai-assistant-to-clickups-mcp-server",
+    "verified_on": "2026-10-30"
+  }
+}

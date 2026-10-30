@@ -1,0 +1,16 @@
+{
+  "_comment": "No critical paths overlap the frontend scope and the tests are mature, so no modifier fires and the role's own low signals decide the tier.",
+  "schema_version": 1,
+  "stack": "TypeScript / React 19 / Vite",
+  "commands": {
+    "test": "npm test",
+    "test_targeted": "npm test -- {path}",
+    "lint": "npm run lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "codebase_size": "small",
+  "test_maturity": "high",
+  "critical_paths": ["src/features/billing/**"],
+  "legacy_paths": [],
+  "incidental_allow": ["package-lock.json"]
+}

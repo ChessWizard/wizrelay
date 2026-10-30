@@ -1,0 +1,9 @@
+{
+  "keys": [
+    "systemMessage"
+  ],
+  "system_message_contains": [
+    "no longer matches",
+    "/wizrelay:sync"
+  ]
+}

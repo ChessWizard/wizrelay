@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "hub": {
+    "url": "x"
+  },
+  "role": "backend",
+  "tracker": {
+    "type": "clickup",
+    "id_prefix": "CU-"
+  },
+  "language": "tr",
+  "base_ref": "origin/main",
+  "prompt_anchor": true,
+  "session_title": true,
+  "fetch_ttl_minutes": 0,
+  "researcher_mention": "@researcher"
+}

@@ -1,0 +1,15 @@
+{
+  "_comment": "Written by `wizrelay init`. Every rule is Edit(...): a Write(path) rule matches nothing at all. This is layer 1 of the scope protection.",
+  "permissions": {
+    "deny": [
+      "Edit(/.wizrelay/tasks/*/task.json)",
+      "Edit(/.wizrelay/tasks/*/research.md)",
+      "Edit(/.wizrelay/tasks/*/scope.md)",
+      "Edit(/.wizrelay/tasks/*/acceptance.md)",
+      "Edit(/.wizrelay/tasks/*/contracts.md)",
+      "Edit(/.wizrelay/tasks/*/decisions.md)",
+      "Edit(/.wizrelay/tasks/*/roles/**)",
+      "Edit(/.wizrelay/tasks/*/.lock.json)"
+    ]
+  }
+}

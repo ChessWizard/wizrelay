@@ -1,0 +1,12 @@
+{
+  "event": "pre-edit",
+  "fixture": "dev_task",
+  "payload": {
+    "session_id": "golden-session",
+    "hook_event_name": "x",
+    "tool_name": "NotebookEdit",
+    "tool_input": {
+      "notebook_path": "notebooks/out.ipynb"
+    }
+  }
+}

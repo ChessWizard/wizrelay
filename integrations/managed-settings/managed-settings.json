@@ -1,0 +1,32 @@
+{
+  "_comment": "Baseline enforcement. Deploy with the CI gate, not instead of it. Point `repo` at your own fork if you do not install from the upstream repository.",
+
+  "extraKnownMarketplaces": {
+    "wizrelay": {
+      "source": {
+        "source": "github",
+        "repo": "ChessWizard/wizrelay",
+        "ref": "v1.0.0"
+      }
+    }
+  },
+
+  "enabledPlugins": {
+    "wizrelay@wizrelay": true
+  },
+
+  "permissions": {
+    "_comment": "Each rule is Edit(...): a Write(path) rule matches nothing at all. The single leading slash anchors at the primary working directory.",
+    "deny": [
+      "Edit(/.wizrelay/tasks/*/task.json)",
+      "Edit(/.wizrelay/tasks/*/research.md)",
+      "Edit(/.wizrelay/tasks/*/scope.md)",
+      "Edit(/.wizrelay/tasks/*/acceptance.md)",
+      "Edit(/.wizrelay/tasks/*/contracts.md)",
+      "Edit(/.wizrelay/tasks/*/decisions.md)",
+      "Edit(/.wizrelay/tasks/*/roles/**)",
+      "Edit(/.wizrelay/tasks/*/.lock.json)"
+    ],
+    "disableBypassPermissionsMode": "disable"
+  }
+}

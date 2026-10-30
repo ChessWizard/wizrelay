@@ -1,0 +1,35 @@
+name: Feature request
+description: Propose a capability that does not exist yet
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What goes wrong today, in terms of a real task handoff.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you propose
+    validations:
+      required: true
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Which layer would change
+      options: ["Core library", "CLI", "Hooks", "Skills", "Agents", "Tracker adapter", "Templates", "CI integration", "Documentation", "Not sure"]
+    validations:
+      required: true
+  - type: checkboxes
+    id: invariants
+    attributes:
+      label: Design invariants
+      options:
+        - label: This does not put team, company or project content inside the plugin (I1)
+          required: true
+        - label: This does not require executing anything from a hub (I2)
+          required: true
+        - label: This keeps the plugin silent in directories with no marker file (I5)
+          required: true

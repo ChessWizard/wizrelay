@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ChessWizard/wizrelay/schemas/profile.schema.json",
+  "title": "wizrelay repository profile",
+  "description": ".wizrelay/profile.json: the repository characteristics routing reads.",
+  "type": "object",
+  "required": ["schema_version"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "stack": { "type": "string", "maxLength": 300 },
+    "commands": {
+      "description": "Project commands. '{path}' in test_targeted is replaced with a path.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "test": { "type": "string", "maxLength": 500 },
+        "test_targeted": { "type": "string", "maxLength": 500 },
+        "lint": { "type": "string", "maxLength": 500 },
+        "typecheck": { "type": "string", "maxLength": 500 },
+        "build": { "type": "string", "maxLength": 500 },
+        "run": { "type": "string", "maxLength": 500 }
+      }
+    },
+    "codebase_size": { "type": "string", "enum": ["small", "medium", "large"] },
+    "test_maturity": { "type": "string", "enum": ["low", "medium", "high"] },
+    "critical_paths": { "type": "array", "items": { "$ref": "#/$defs/glob" } },
+    "legacy_paths": { "type": "array", "items": { "$ref": "#/$defs/glob" } },
+    "incidental_allow": {
+      "description": "Paths an in-scope change may legitimately touch, such as lock files.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/glob" }
+    }
+  },
+  "$defs": {
+    "glob": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!~)(?!.*(^|/)\\.\\.($|/)).+$"
+    }
+  }
+}

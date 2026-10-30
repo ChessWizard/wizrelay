@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ChessWizard/wizrelay/schemas/routing-policy.schema.json",
+  "title": "wizrelay routing policy",
+  "description": "Turns a score into a tier and a tier into per-phase model and effort.",
+  "type": "object",
+  "required": ["schema_version", "tiers"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "modifiers": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "codebase_size_large": { "type": "integer", "minimum": 0, "maximum": 10 },
+        "test_maturity_low": { "type": "integer", "minimum": 0, "maximum": 10 },
+        "touches_critical_paths": { "type": "integer", "minimum": 0, "maximum": 10 },
+        "touches_legacy_paths": { "type": "integer", "minimum": 0, "maximum": 10 }
+      }
+    },
+    "tiers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "max_score", "phases"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 60 },
+          "max_score": { "type": "integer" },
+          "phases": { "$ref": "#/$defs/phases" }
+        }
+      }
+    },
+    "mechanical": {
+      "description": "Used when signals.kind is 'mechanical', bypassing the score.",
+      "type": "object",
+      "required": ["name", "phases"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "phases": { "$ref": "#/$defs/phases" }
+      }
+    }
+  },
+  "$defs": {
+    "phaseSetting": {
+      "type": "object",
+      "required": ["model", "effort"],
+      "additionalProperties": false,
+      "properties": {
+        "model": { "type": "string", "enum": ["haiku", "sonnet", "opus", "opusplan", "fable", "inherit"] },
+        "effort": { "type": "string", "enum": ["low", "medium", "high", "xhigh", "max"] },
+        "advisor": { "type": "string", "enum": ["sonnet", "opus", "fable"] }
+      }
+    },
+    "phases": {
+      "type": "object",
+      "required": ["plan", "implement", "verify", "ask"],
+      "additionalProperties": false,
+      "properties": {
+        "plan": { "$ref": "#/$defs/phaseSetting" },
+        "implement": { "$ref": "#/$defs/phaseSetting" },
+        "verify": { "$ref": "#/$defs/phaseSetting" },
+        "ask": { "$ref": "#/$defs/phaseSetting" }
+      }
+    }
+  }
+}

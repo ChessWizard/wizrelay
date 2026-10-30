@@ -1,0 +1,16 @@
+{
+  "_comment": "This profile is why the same package routes to T3 here and T1 in the frontend example: `test_maturity: low` and an overlap between the backend scope and `critical_paths` each add a point.",
+  "schema_version": 1,
+  "stack": "Python 3.12 / FastAPI / PostgreSQL / Redis",
+  "commands": {
+    "test": "pytest -q",
+    "test_targeted": "pytest -q {path}",
+    "lint": "ruff check .",
+    "typecheck": "mypy app"
+  },
+  "codebase_size": "medium",
+  "test_maturity": "low",
+  "critical_paths": ["app/billing/**", "app/api/**"],
+  "legacy_paths": [],
+  "incidental_allow": []
+}

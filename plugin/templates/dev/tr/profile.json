@@ -1,0 +1,16 @@
+{
+  "_comment": "Yönlendirmenin okuduğu repo özellikleri. _ ile başlayan anahtarlar yok sayılır.",
+  "schema_version": 1,
+  "stack": "{{Python 3.12 / FastAPI / PostgreSQL}}",
+  "commands": {
+    "test": "{{pytest -q}}",
+    "test_targeted": "{{pytest -q {path}}}",
+    "lint": "{{ruff check .}}",
+    "typecheck": "{{mypy app}}"
+  },
+  "codebase_size": "medium",
+  "test_maturity": "medium",
+  "critical_paths": [],
+  "legacy_paths": [],
+  "incidental_allow": []
+}

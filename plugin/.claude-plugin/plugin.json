@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "wizrelay",
+  "displayName": "wizrelay",
+  "version": "0.1.0",
+  "description": "Carries a researcher's task analysis into every Claude Code session: deterministic context, layered scope protection, model and effort routing, and developer-side verification.",
+  "author": {
+    "name": "wizrelay contributors",
+    "url": "https://github.com/ChessWizard/wizrelay"
+  },
+  "homepage": "https://github.com/ChessWizard/wizrelay",
+  "repository": "https://github.com/ChessWizard/wizrelay",
+  "license": "Apache-2.0",
+  "keywords": [
+    "research",
+    "scope",
+    "handoff",
+    "routing",
+    "verification",
+    "ai-native"
+  ]
+}

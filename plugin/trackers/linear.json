@@ -1,0 +1,15 @@
+{
+  "type": "linear",
+  "display_name": "Linear",
+  "level": "beta",
+  "ref_pattern": "^(?<ref>[A-Z][A-Z0-9]*-[0-9]{1,9})$",
+  "canonical_id": "{ref}",
+  "url_template": "https://linear.app/{workspace}/issue/{ref}",
+  "required_config": ["workspace"],
+  "uppercase_ref": true,
+  "mcp": {
+    "name": "linear",
+    "verified": false,
+    "note": "Verify the official endpoint in phase 6 before writing it into any configuration."
+  }
+}

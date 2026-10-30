@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "hub": {
+    "path": "../hub",
+    "branch": "main"
+  },
+  "role": "frontend",
+  "tracker": {
+    "type": "clickup",
+    "id_prefix": "CU-"
+  },
+  "language": "en",
+  "base_ref": "origin/main",
+  "prompt_anchor": true,
+  "session_title": true,
+  "fetch_ttl_minutes": 10,
+  "researcher_mention": ""
+}

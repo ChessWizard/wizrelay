@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "CU-86c1abcd",
+  "tracker": {
+    "type": "clickup",
+    "ref": "86c1abcd",
+    "url": "https://app.clickup.com/t/86c1abcd"
+  },
+  "title": "Tenant quota",
+  "slug": "tenant-quota",
+  "version": 2,
+  "status": "published",
+  "updated_at": "2026-10-30",
+  "roles": [
+    "backend",
+    "frontend"
+  ],
+  "repos": {
+    "backend": "acme/api-service"
+  },
+  "enforcement": "strict",
+  "scope": {
+    "backend": {
+      "allow": [
+        "../etc/**"
+      ],
+      "deny": [
+        "app/billing/**"
+      ]
+    },
+    "frontend": {
+      "allow": [
+        "src/features/quota/**"
+      ],
+      "deny": []
+    }
+  },
+  "routing": {
+    "signals": {
+      "complexity": "medium",
+      "risk": "high",
+      "ambiguity": "low"
+    },
+    "role_signals": {
+      "frontend": {
+        "complexity": "low"
+      }
+    },
+    "overrides": {
+      "*": {
+        "verify": {
+          "model": "opus",
+          "effort": "max"
+        }
+      }
+    }
+  },
+  "changelog": [
+    {
+      "version": 1,
+      "date": "2026-10-29",
+      "summary": "First"
+    }
+  ]
+}

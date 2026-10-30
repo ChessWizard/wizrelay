@@ -1,0 +1,138 @@
+name: "wizrelay scope audit"
+description: >-
+  Check that a pull request stays inside the scope the researcher published for its task.
+  Finds the task from the branch name or the pull request title, runs `wizrelay audit`,
+  and writes the result to the job summary.
+author: "wizrelay contributors"
+branding:
+  icon: shield
+  color: purple
+
+inputs:
+  version:
+    description: "The wizrelay version to install: a tag, a branch, or a commit."
+    required: false
+    default: "v1.0.0"
+  base:
+    description: "Base ref to diff against. Defaults to the pull request's base branch."
+    required: false
+    default: ""
+  task:
+    description: "Task reference. When empty, it is taken from the branch name, then the PR title."
+    required: false
+    default: ""
+  on-missing-task:
+    description: "What to do when no task can be determined: `skip` or `fail`."
+    required: false
+    default: "skip"
+  python-version:
+    description: "Python version used to run wizrelay."
+    required: false
+    default: "3.12"
+
+outputs:
+  violations:
+    description: "Number of violations found. `0` when clean or skipped."
+    value: ${{ steps.audit.outputs.violations }}
+  skipped:
+    description: "`true` when no task could be determined and `on-missing-task` is `skip`."
+    value: ${{ steps.audit.outputs.skipped }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install wizrelay
+      shell: bash
+      run: |
+        python -m pip install --quiet \
+          "git+https://github.com/ChessWizard/wizrelay@${{ inputs.version }}"
+
+    - name: Fetch the base branch
+      shell: bash
+      env:
+        INPUT_BASE: ${{ inputs.base }}
+        PR_BASE: ${{ github.event.pull_request.base.ref }}
+      run: |
+        # `audit` diffs base...HEAD. A shallow checkout has no base commit, and without
+        # this fetch the audit degrades to the working tree, which in CI is empty.
+        BASE="${INPUT_BASE:-$PR_BASE}"
+        if [ -n "$BASE" ]; then
+          git fetch --no-tags --depth=50 origin "+refs/heads/$BASE:refs/remotes/origin/$BASE" || true
+        fi
+
+    - name: Audit
+      id: audit
+      shell: bash
+      env:
+        INPUT_BASE: ${{ inputs.base }}
+        INPUT_TASK: ${{ inputs.task }}
+        ON_MISSING: ${{ inputs.on-missing-task }}
+        PR_BASE: ${{ github.event.pull_request.base.ref }}
+        PR_TITLE: ${{ github.event.pull_request.title }}
+        HEAD_REF: ${{ github.head_ref }}
+      run: |
+        set -uo pipefail
+        BASE="${INPUT_BASE:-$PR_BASE}"
+        BRANCH="${HEAD_REF:-${GITHUB_REF_NAME:-}}"
+
+        ARGS=(audit --format json)
+        [ -n "$BASE" ] && ARGS+=(--base "origin/$BASE")
+
+        if [ -n "$INPUT_TASK" ]; then
+          ARGS+=(--task "$INPUT_TASK")
+        elif [ -n "$BRANCH" ]; then
+          ARGS+=(--branch "$BRANCH")
+        fi
+        [ "$ON_MISSING" = "fail" ] && ARGS+=(--require-task)
+
+        # --no-fail keeps the exit code out of it; the verdict comes from the JSON, so a
+        # parse problem cannot silently pass the gate.
+        wizrelay "${ARGS[@]}" --no-fail > audit.json
+        STATUS=$?
+
+        if [ $STATUS -ne 0 ] || [ ! -s audit.json ]; then
+          echo "wizrelay audit could not be run (exit $STATUS)." >> "$GITHUB_STEP_SUMMARY"
+          echo "violations=0" >> "$GITHUB_OUTPUT"
+          echo "skipped=true" >> "$GITHUB_OUTPUT"
+          [ "$ON_MISSING" = "fail" ] && exit 1
+          exit 0
+        fi
+
+        SKIPPED=$(python -c "import json;print(str(json.load(open('audit.json')).get('skipped', False)).lower())")
+        if [ "$SKIPPED" = "true" ]; then
+          REASON=$(python -c "import json;print(json.load(open('audit.json')).get('reason',''))")
+          {
+            echo "### wizrelay scope audit"
+            echo
+            echo "Skipped: $REASON"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "violations=0" >> "$GITHUB_OUTPUT"
+          echo "skipped=true" >> "$GITHUB_OUTPUT"
+          [ "$ON_MISSING" = "fail" ] && exit 1
+          exit 0
+        fi
+
+        # Re-run for the Markdown the summary shows. Two runs rather than one keeps the
+        # machine-readable verdict and the human-readable report from fighting over stdout;
+        # the audit is read-only, so running it twice costs only time.
+        {
+          echo "### wizrelay scope audit"
+          echo
+          wizrelay audit ${BASE:+--base "origin/$BASE"} ${INPUT_TASK:+--task "$INPUT_TASK"} \
+            ${BRANCH:+--branch "$BRANCH"} --format md --no-fail || true
+        } >> "$GITHUB_STEP_SUMMARY"
+
+        VIOLATIONS=$(python -c "import json;print(json.load(open('audit.json')).get('violations',0))")
+        echo "violations=$VIOLATIONS" >> "$GITHUB_OUTPUT"
+        echo "skipped=false" >> "$GITHUB_OUTPUT"
+
+        if [ "$VIOLATIONS" != "0" ]; then
+          echo "::error title=wizrelay scope audit::$VIOLATIONS violation(s). See the job summary."
+          exit 1
+        fi
+        echo "wizrelay scope audit is clean."

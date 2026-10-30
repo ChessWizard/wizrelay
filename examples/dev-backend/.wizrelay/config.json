@@ -1,0 +1,19 @@
+{
+  "_comment": "A relative hub path keeps this example self-contained: nothing is cloned and no network is used. A real project sets `hub.repo` to a git URL instead.",
+  "schema_version": 1,
+  "hub": {
+    "path": "../hub",
+    "branch": "main"
+  },
+  "role": "backend",
+  "tracker": {
+    "type": "clickup",
+    "id_prefix": "CU-"
+  },
+  "language": "en",
+  "base_ref": "origin/main",
+  "prompt_anchor": true,
+  "session_title": true,
+  "fetch_ttl_minutes": 10,
+  "researcher_mention": ""
+}

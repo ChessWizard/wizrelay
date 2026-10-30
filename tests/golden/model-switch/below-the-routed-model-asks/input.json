@@ -1,0 +1,10 @@
+{
+  "event": "model-switch",
+  "fixture": "dev_task",
+  "payload": {
+    "session_id": "golden-session",
+    "hook_event_name": "x",
+    "from_model": "sonnet",
+    "to_model": "haiku"
+  }
+}

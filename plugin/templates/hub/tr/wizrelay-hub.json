@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "name": "{{your-team-research-hub}}",
+  "language": "{{en}}",
+  "tracker": {
+    "type": "{{none}}"
+  },
+  "roles": ["{{backend}}", "{{frontend}}"],
+  "default_branch": "main",
+  "base_ref": "origin/main",
+  "default_enforcement": "strict",
+  "researcher_mention": ""
+}

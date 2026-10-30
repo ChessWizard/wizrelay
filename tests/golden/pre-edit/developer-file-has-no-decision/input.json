@@ -1,0 +1,12 @@
+{
+  "event": "pre-edit",
+  "fixture": "dev_task",
+  "payload": {
+    "session_id": "golden-session",
+    "hook_event_name": "x",
+    "tool_name": "Edit",
+    "tool_input": {
+      "file_path": ".wizrelay/tasks/CU-86c1abcd-tenant-quota/plan.md"
+    }
+  }
+}

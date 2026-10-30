@@ -1,0 +1,10 @@
+{
+  "type": "none",
+  "display_name": "No tracker",
+  "level": "full",
+  "ref_pattern": "^(?<ref>[A-Za-z0-9][A-Za-z0-9._-]{0,60})$",
+  "canonical_id": "{ref}",
+  "url_template": null,
+  "required_config": [],
+  "mcp": null
+}

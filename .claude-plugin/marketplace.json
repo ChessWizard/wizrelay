@@ -1,0 +1,17 @@
+{
+  "name": "wizrelay",
+  "description": "wizrelay: carry a researcher's task analysis into every Claude Code session, deterministically.",
+  "owner": {
+    "name": "wizrelay contributors",
+    "url": "https://github.com/ChessWizard/wizrelay"
+  },
+  "plugins": [
+    {
+      "name": "wizrelay",
+      "source": "./plugin",
+      "description": "Scope protection, deterministic context, model routing and verification for researcher-to-developer task handoff.",
+      "category": "workflow",
+      "tags": ["research", "scope", "handoff", "routing", "verification"]
+    }
+  ]
+}

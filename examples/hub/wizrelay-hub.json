@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "name": "example-research-hub",
+  "language": "en",
+  "tracker": {
+    "type": "clickup",
+    "id_prefix": "CU-"
+  },
+  "roles": [
+    "backend",
+    "frontend",
+    "mobile"
+  ],
+  "default_branch": "main",
+  "base_ref": "origin/main",
+  "default_enforcement": "strict",
+  "researcher_mention": ""
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "stack": "Python 3.12 / FastAPI",
+  "commands": {
+    "deploy": "ship"
+  },
+  "codebase_size": "large",
+  "test_maturity": "low",
+  "critical_paths": [
+    "app/auth/**"
+  ],
+  "legacy_paths": [],
+  "incidental_allow": [
+    "poetry.lock"
+  ]
+}

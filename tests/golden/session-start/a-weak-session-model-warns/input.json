@@ -1,0 +1,10 @@
+{
+  "event": "session-start",
+  "fixture": "dev_task",
+  "payload": {
+    "session_id": "golden-session",
+    "hook_event_name": "x",
+    "source": "startup",
+    "model": "haiku"
+  }
+}

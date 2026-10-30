@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "task_id": "CU-86c1abcd",
+  "tracker_ref": "86c1abcd",
+  "title": "Tenant quota",
+  "folder": "CU-86c1abcd-tenant-quota",
+  "version": 2,
+  "status": "published",
+  "hub_commit": "f95f2307ad3c",
+  "hub_id": "acme-hub-2e807908",
+  "pulled_at": "2026-10-30T09:12:44+00:00",
+  "role": "backend",
+  "routing": {
+    "tier": "T2-standard",
+    "score": 6,
+    "phases": {},
+    "launch": "claude --model opusplan"
+  }
+}

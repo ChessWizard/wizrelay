@@ -1,0 +1,10 @@
+{
+  "contains": [
+    "CU-86c1abcd v2",
+    "In scope:"
+  ],
+  "absent_keys": [
+    "sessionTitle"
+  ],
+  "max_chars": 8000
+}

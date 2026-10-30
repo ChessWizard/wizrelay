@@ -1,0 +1,9 @@
+{
+  "name": "example-web-app",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "test": "echo 'example project: no tests to run'",
+    "lint": "echo 'example project: no linter configured'"
+  }
+}

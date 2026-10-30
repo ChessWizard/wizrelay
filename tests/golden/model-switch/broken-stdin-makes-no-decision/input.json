@@ -1,0 +1,5 @@
+{
+  "event": "model-switch",
+  "fixture": "dev_task",
+  "payload": "__RAW_NOT_JSON__"
+}

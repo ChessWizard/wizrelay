@@ -1,0 +1,9 @@
+{
+  "event": "prompt",
+  "fixture": "dev_no_anchor",
+  "payload": {
+    "session_id": "golden-session",
+    "hook_event_name": "x",
+    "prompt": "go"
+  }
+}

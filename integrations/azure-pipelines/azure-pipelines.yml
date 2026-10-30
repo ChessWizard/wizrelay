@@ -1,0 +1,50 @@
+# wizrelay scope audit for Azure Pipelines.
+#
+# Copy this job into your pipeline, or reference it as a template.
+
+parameters:
+  - name: wizrelayVersion
+    type: string
+    default: v1.0.0
+  - name: onMissingTask
+    type: string
+    default: skip
+    values:
+      - skip
+      - fail
+
+jobs:
+  - job: wizrelay_scope
+    displayName: wizrelay scope audit
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+      - checkout: self
+        # The audit diffs base...HEAD, so the merge base has to be in the clone.
+        fetchDepth: 0
+
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: "3.12"
+
+      - script: |
+          python -m pip install --quiet \
+            "git+https://github.com/ChessWizard/wizrelay@${{ parameters.wizrelayVersion }}"
+        displayName: Install wizrelay
+
+      - script: |
+          set -uo pipefail
+          BASE="$(System.PullRequest.TargetBranchName)"
+          BRANCH="$(System.PullRequest.SourceBranch)"
+          git fetch --no-tags --depth=50 origin "+refs/heads/$BASE:refs/remotes/origin/$BASE" || true
+
+          ARGS=(audit --base "origin/$BASE" --branch "$BRANCH" --format md)
+          if [ "${{ parameters.onMissingTask }}" = "fail" ]; then ARGS+=(--require-task); fi
+
+          wizrelay "${ARGS[@]}" | tee "$(Build.ArtifactStagingDirectory)/wizrelay-audit.md"
+        displayName: Audit scope
+
+      - publish: $(Build.ArtifactStagingDirectory)/wizrelay-audit.md
+        artifact: wizrelay-audit
+        condition: always()

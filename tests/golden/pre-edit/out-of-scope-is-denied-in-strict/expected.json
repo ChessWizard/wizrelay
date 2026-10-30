@@ -1,0 +1,7 @@
+{
+  "decision": "deny",
+  "reason_contains": [
+    "outside the scope",
+    "app/quota/**"
+  ]
+}

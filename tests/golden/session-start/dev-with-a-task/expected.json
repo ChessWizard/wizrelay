@@ -1,0 +1,27 @@
+{
+  "contains": [
+    "CU-86c1abcd v2",
+    "Role: backend",
+    "Enforcement: strict",
+    "acceptance.md",
+    "roles/backend.md",
+    "In scope:",
+    "app/quota/**",
+    "Explicitly denied:",
+    "app/billing/**",
+    "AC-1:",
+    "Routing:",
+    "T2-standard",
+    "sonnet",
+    "Plan progress: 1 of 2",
+    "1 question(s) are still open",
+    ".wizrelay/PROTOCOL.md"
+  ],
+  "keys": [
+    "sessionTitle"
+  ],
+  "absent_keys": [
+    "systemMessage"
+  ],
+  "max_chars": 8000
+}

@@ -1,0 +1,14 @@
+{
+  "type": "azure-devops",
+  "display_name": "Azure DevOps Boards",
+  "level": "beta",
+  "ref_pattern": "^(?:AB[#-])?(?<ref>[0-9]{1,9})$",
+  "canonical_id": "AB-{ref}",
+  "url_template": "{base_url}/{project}/_workitems/edit/{ref}",
+  "required_config": ["base_url", "project"],
+  "mcp": {
+    "name": "azure-devops",
+    "verified": false,
+    "note": "Verify the official endpoint in phase 6 before writing it into any configuration."
+  }
+}

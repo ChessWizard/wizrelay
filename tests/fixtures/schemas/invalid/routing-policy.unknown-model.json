@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "modifiers": {
+    "codebase_size_large": 1,
+    "test_maturity_low": 1,
+    "touches_critical_paths": 1,
+    "touches_legacy_paths": 1
+  },
+  "tiers": [
+    {
+      "name": "T1-routine",
+      "max_score": 4,
+      "phases": {
+        "plan": {
+          "model": "gpt",
+          "effort": "medium"
+        },
+        "implement": {
+          "model": "sonnet",
+          "effort": "medium"
+        },
+        "verify": {
+          "model": "sonnet",
+          "effort": "medium"
+        },
+        "ask": {
+          "model": "sonnet",
+          "effort": "low"
+        }
+      }
+    },
+    {
+      "name": "T2-standard",
+      "max_score": 6,
+      "phases": {
+        "plan": {
+          "model": "opus",
+          "effort": "high"
+        },
+        "implement": {
+          "model": "sonnet",
+          "effort": "high"
+        },
+        "verify": {
+          "model": "sonnet",
+          "effort": "high"
+        },
+        "ask": {
+          "model": "sonnet",
+          "effort": "low"
+        }
+      }
+    },
+    {
+      "name": "T3-critical",
+      "max_score": 8,
+      "phases": {
+        "plan": {
+          "model": "opus",
+          "effort": "xhigh"
+        },
+        "implement": {
+          "model": "opus",
+          "effort": "high"
+        },
+        "verify": {
+          "model": "opus",
+          "effort": "high"
+        },
+        "ask": {
+          "model": "sonnet",
+          "effort": "medium"
+        }
+      }
+    },
+    {
+      "name": "T4-high-risk",
+      "max_score": 99,
+      "phases": {
+        "plan": {
+          "model": "opus",
+          "effort": "xhigh"
+        },
+        "implement": {
+          "model": "opus",
+          "effort": "high",
+          "advisor": "opus"
+        },
+        "verify": {
+          "model": "opus",
+          "effort": "xhigh"
+        },
+        "ask": {
+          "model": "opus",
+          "effort": "low"
+        }
+      }
+    }
+  ],
+  "mechanical": {
+    "name": "T0-mechanical",
+    "phases": {
+      "plan": {
+        "model": "sonnet",
+        "effort": "low"
+      },
+      "implement": {
+        "model": "haiku",
+        "effort": "medium"
+      },
+      "verify": {
+        "model": "sonnet",
+        "effort": "medium"
+      },
+      "ask": {
+        "model": "haiku",
+        "effort": "low"
+      }
+    }
+  }
+}

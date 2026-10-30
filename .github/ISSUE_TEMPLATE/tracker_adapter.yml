@@ -1,0 +1,50 @@
+name: Tracker adapter request
+description: Ask for support for another issue tracker
+labels: ["enhancement", "tracker"]
+body:
+  - type: input
+    id: tracker
+    attributes:
+      label: Tracker name
+      placeholder: "Shortcut"
+    validations:
+      required: true
+  - type: input
+    id: canonical
+    attributes:
+      label: Canonical identifier form
+      description: What wizrelay should store in task.json as `id`.
+      placeholder: "SC-1234"
+    validations:
+      required: true
+  - type: textarea
+    id: raw
+    attributes:
+      label: Raw reference forms users paste
+      placeholder: |
+        sc-1234
+        #1234
+        https://app.shortcut.com/org/story/1234
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: URL template
+      placeholder: "https://app.shortcut.com/{workspace}/story/{ref}"
+    validations:
+      required: true
+  - type: textarea
+    id: mcp
+    attributes:
+      label: Official MCP endpoint, if one exists
+      description: |
+        Give the vendor's own documentation URL. An endpoint is only written into a user's
+        configuration once it is verified, with the source quoted in the issue; until then the
+        adapter ships instructions only.
+  - type: checkboxes
+    id: willing
+    attributes:
+      label: Contribution
+      options:
+        - label: I can test the adapter against a real workspace

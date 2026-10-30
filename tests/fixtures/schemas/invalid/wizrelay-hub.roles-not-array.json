@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "name": "acme-research-hub",
+  "language": "tr",
+  "tracker": {
+    "type": "clickup",
+    "id_prefix": "CU-"
+  },
+  "roles": "backend",
+  "default_branch": "main",
+  "base_ref": "origin/main",
+  "default_enforcement": "strict",
+  "researcher_mention": "@researcher"
+}

@@ -1,0 +1,5 @@
+{
+  "event": "session-start",
+  "fixture": "silent",
+  "payload": "__RAW_NOT_JSON__"
+}

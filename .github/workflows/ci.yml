@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint and types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m ruff check .
+      - run: python -m ruff format --check .
+      - run: python -m mypy
+
+  test:
+    name: Test ${{ matrix.os }} / py${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Three operating systems, three Python versions.
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.9", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      # Integration tests build local git repositories; no network is used.
+      - name: Configure git for test fixtures
+        run: |
+          git config --global user.email "ci@example.com"
+          git config --global user.name "CI"
+          git config --global init.defaultBranch main
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m pytest -q
+
+  coverage:
+    name: Coverage gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Configure git for test fixtures
+        run: |
+          git config --global user.email "ci@example.com"
+          git config --global user.name "CI"
+          git config --global init.defaultBranch main
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m pytest --cov=wizrelay --cov-report=xml --cov-fail-under=80 -q
+      - run: python scripts/check_core_coverage.py
+
+  structure:
+    name: Plugin structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/validate_plugin_structure.py
+
+  docs:
+    name: Documentation navigation and links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # The navigation and both indexes are generated; a stale block means wrong links.
+      - run: python scripts/docs_nav.py --check
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m pytest tests/unit/test_docs.py -q
+
+  validate-plugin:
+    name: claude plugin validate --strict
+    runs-on: ubuntu-latest
+    # Informational until the CLI is reliably installable in CI.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Claude Code
+        id: install
+        continue-on-error: true
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Validate
+        if: steps.install.outcome == 'success'
+        run: claude plugin validate ./plugin --strict
+      - name: Report a skip
+        if: steps.install.outcome != 'success'
+        run: echo "Claude Code CLI unavailable; plugin validation skipped (needs a local run)."
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

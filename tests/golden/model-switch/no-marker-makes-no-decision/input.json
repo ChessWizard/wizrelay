@@ -1,0 +1,10 @@
+{
+  "event": "model-switch",
+  "fixture": "silent",
+  "payload": {
+    "session_id": "golden-session",
+    "hook_event_name": "x",
+    "from_model": "opus",
+    "to_model": "haiku"
+  }
+}

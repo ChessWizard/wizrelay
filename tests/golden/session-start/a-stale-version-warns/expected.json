@@ -1,0 +1,10 @@
+{
+  "keys": [
+    "systemMessage"
+  ],
+  "system_message_contains": [
+    "you have v1",
+    "the hub has v2",
+    "/wizrelay:sync"
+  ]
+}

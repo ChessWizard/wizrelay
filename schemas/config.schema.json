@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ChessWizard/wizrelay/schemas/config.schema.json",
+  "title": "wizrelay project configuration",
+  "description": ".wizrelay/config.json and .wizrelay/config.local.json. Keys beginning with '_' are comments and are ignored.",
+  "type": "object",
+  "required": ["schema_version"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "hub": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repo": {
+          "description": "Git URL of the team hub. A URL with embedded credentials is rejected at runtime.",
+          "type": "string",
+          "maxLength": 2000
+        },
+        "branch": { "type": "string", "maxLength": 300 },
+        "path": {
+          "description": "A local working copy. When set, no cache is used and the copy is never fetched or reset.",
+          "type": "string",
+          "maxLength": 4096
+        }
+      }
+    },
+    "role": { "type": "string", "minLength": 1, "maxLength": 60 },
+    "tracker": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["clickup", "github", "jira", "linear", "azure-devops", "none"]
+        },
+        "id_prefix": { "type": "string", "maxLength": 20 },
+        "base_url": { "type": "string", "maxLength": 2000 },
+        "workspace": { "type": "string", "maxLength": 200 },
+        "project": { "type": "string", "maxLength": 200 },
+        "repo": { "type": "string", "maxLength": 300 }
+      }
+    },
+    "language": { "type": "string", "enum": ["en", "tr"] },
+    "base_ref": { "type": "string", "maxLength": 300 },
+    "prompt_anchor": { "type": "boolean" },
+    "session_title": { "type": "boolean" },
+    "fetch_ttl_minutes": {
+      "description": "0 means fetch on every run.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10080
+    },
+    "researcher_mention": { "type": "string", "maxLength": 100 }
+  }
+}

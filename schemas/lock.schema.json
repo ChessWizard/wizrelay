@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ChessWizard/wizrelay/schemas/lock.schema.json",
+  "title": "wizrelay package lock",
+  "description": ".lock.json: what was pulled, from which hub commit, with which hashes (invariant I12).",
+  "type": "object",
+  "required": ["schema_version", "task_id", "folder", "version", "pulled_at", "files"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "task_id": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "tracker_ref": { "type": "string", "maxLength": 200 },
+    "title": { "type": "string", "maxLength": 300 },
+    "folder": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "version": { "type": "integer", "minimum": 0 },
+    "hub_commit": { "type": "string", "maxLength": 64 },
+    "hub_id": {
+      "description": "Normalised hub identity, so two hubs never share a lock (invariant I4).",
+      "type": "string",
+      "maxLength": 200
+    },
+    "pulled_at": { "type": "string", "minLength": 10, "maxLength": 40 },
+    "role": { "type": "string", "maxLength": 60 },
+    "status": { "type": "string", "enum": ["draft", "published", "archived"] },
+    "files": {
+      "description": "Package-relative POSIX path to sha256 hex digest.",
+      "type": "object",
+      "additionalProperties": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    },
+    "routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tier": { "type": "string", "maxLength": 60 },
+        "score": { "type": "integer" },
+        "phases": { "type": "object" },
+        "launch": { "type": "string", "maxLength": 1000 }
+      }
+    }
+  }
+}

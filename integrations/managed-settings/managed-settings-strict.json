@@ -1,0 +1,39 @@
+{
+  "_comment": "Strict enforcement. Adds a model and effort floor and prevents hooks being disabled. Read the cost table in README.md before deploying this instead of the baseline.",
+
+  "extraKnownMarketplaces": {
+    "wizrelay": {
+      "source": {
+        "source": "github",
+        "repo": "ChessWizard/wizrelay",
+        "ref": "v1.0.0"
+      }
+    }
+  },
+
+  "enabledPlugins": {
+    "wizrelay@wizrelay": true
+  },
+
+  "permissions": {
+    "deny": [
+      "Edit(/.wizrelay/tasks/*/task.json)",
+      "Edit(/.wizrelay/tasks/*/research.md)",
+      "Edit(/.wizrelay/tasks/*/scope.md)",
+      "Edit(/.wizrelay/tasks/*/acceptance.md)",
+      "Edit(/.wizrelay/tasks/*/contracts.md)",
+      "Edit(/.wizrelay/tasks/*/decisions.md)",
+      "Edit(/.wizrelay/tasks/*/roles/**)",
+      "Edit(/.wizrelay/tasks/*/.lock.json)"
+    ],
+    "disableBypassPermissionsMode": "disable",
+    "disableAutoMode": "disable"
+  },
+
+  "_comment_hooks": "false here means a user cannot set it to true. It affects every plugin's hooks, not only wizrelay's.",
+  "disableAllHooks": false,
+
+  "_comment_model": "A floor, not a target. routing still proposes a stronger model per task; this only stops a session dropping below it. `effortLevel` does not accept `max`.",
+  "model": "sonnet",
+  "effortLevel": "medium"
+}

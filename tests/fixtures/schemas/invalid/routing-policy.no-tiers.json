@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "modifiers": {
+    "codebase_size_large": 1,
+    "test_maturity_low": 1,
+    "touches_critical_paths": 1,
+    "touches_legacy_paths": 1
+  },
+  "tiers": [],
+  "mechanical": {
+    "name": "T0-mechanical",
+    "phases": {
+      "plan": {
+        "model": "sonnet",
+        "effort": "low"
+      },
+      "implement": {
+        "model": "haiku",
+        "effort": "medium"
+      },
+      "verify": {
+        "model": "sonnet",
+        "effort": "medium"
+      },
+      "ask": {
+        "model": "haiku",
+        "effort": "low"
+      }
+    }
+  }
+}

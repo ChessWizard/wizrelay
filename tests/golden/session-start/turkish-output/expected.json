@@ -1,0 +1,11 @@
+{
+  "contains": [
+    "Aktif araştırma paketi",
+    "Rol: backend",
+    "Kapsam içi:"
+  ],
+  "absent": [
+    "Active research package"
+  ],
+  "max_chars": 8000
+}

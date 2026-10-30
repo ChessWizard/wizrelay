@@ -1,0 +1,12 @@
+# Default owners for everything in the repository.
+* @ChessWizard
+
+# The plan is a contract: only the plan owner changes it.
+
+# The hook contract and its golden tests guard scope protection.
+/plugin/hooks/ @ChessWizard
+/plugin/lib/wizrelay/hooks/ @ChessWizard
+/tests/golden/ @ChessWizard
+
+# Schemas are data contracts shared with every hub.
+/schemas/ @ChessWizard

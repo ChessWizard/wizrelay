@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ChessWizard/wizrelay/schemas/wizrelay-hub.schema.json",
+  "title": "wizrelay hub marker",
+  "description": "wizrelay-hub.json at the hub repository root. Its presence is what makes a directory the hub persona.",
+  "type": "object",
+  "required": ["schema_version", "name"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "language": { "type": "string", "enum": ["en", "tr"] },
+    "tracker": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["clickup", "github", "jira", "linear", "azure-devops", "none"]
+        },
+        "id_prefix": { "type": "string", "maxLength": 20 },
+        "base_url": { "type": "string", "maxLength": 2000 },
+        "workspace": { "type": "string", "maxLength": 200 },
+        "project": { "type": "string", "maxLength": 200 },
+        "repo": { "type": "string", "maxLength": 300 }
+      }
+    },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 60 }
+    },
+    "default_branch": { "type": "string", "maxLength": 300 },
+    "base_ref": { "type": "string", "maxLength": 300 },
+    "default_enforcement": { "type": "string", "enum": ["strict", "ask", "off"] },
+    "researcher_mention": { "type": "string", "maxLength": 100 }
+  }
+}

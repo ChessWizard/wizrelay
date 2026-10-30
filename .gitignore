@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Test and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Editors and OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Claude Code local settings (project settings are committed)
+.claude/settings.local.json
+
+# Reference material: behaviour reference only, never distributed (AC-P0-04)
+reference/
+evals/results/
+
+# Internal: the planning, specification and research layer is maintained outside this
+# repository and must never be published.
+# Anchored with a leading slash: a bare `CLAUDE.md` would also exclude the templates
+# the plugin writes and the example projects, and on a case-insensitive filesystem a
+# bare `PLAN.md` would also exclude `plugin/templates/dev/*/plan.md`.
+/PLAN.md
+/CLAUDE.md
+/docs/integration.md
+/docs/research/
+/docs/decisions/
+/docs/testing/

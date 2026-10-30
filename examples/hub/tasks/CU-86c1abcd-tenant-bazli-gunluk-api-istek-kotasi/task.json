@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "CU-86c1abcd",
+  "tracker": {
+    "type": "clickup",
+    "ref": "86c1abcd",
+    "url": "https://app.clickup.com/t/86c1abcd"
+  },
+  "title": "Tenant bazlı günlük API istek kotası",
+  "slug": "tenant-bazli-gunluk-api-istek-kotasi",
+  "version": 1,
+  "status": "published",
+  "roles": [
+    "backend",
+    "frontend"
+  ],
+  "enforcement": "strict",
+  "scope": {
+    "backend": {
+      "allow": [
+        "app/quota/**",
+        "app/api/limits.py",
+        "tests/quota/**"
+      ],
+      "deny": [
+        "app/billing/**"
+      ]
+    },
+    "frontend": {
+      "allow": [
+        "src/features/usage/**"
+      ],
+      "deny": []
+    }
+  },
+  "routing": {
+    "signals": {
+      "complexity": "medium",
+      "risk": "high",
+      "ambiguity": "low"
+    },
+    "role_signals": {
+      "frontend": {
+        "complexity": "low",
+        "risk": "low",
+        "ambiguity": "low"
+      }
+    },
+    "overrides": {}
+  },
+  "changelog": [
+    {
+      "version": 1,
+      "date": "2026-10-30",
+      "summary": "First publication"
+    }
+  ],
+  "repos": {
+    "backend": "acme/api-service",
+    "frontend": "acme/web-app"
+  },
+  "updated_at": "2026-10-29"
+}

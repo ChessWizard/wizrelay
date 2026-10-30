@@ -1,0 +1,7 @@
+{
+  "decision": "deny",
+  "reason_contains": [
+    "explicitly denied",
+    "app/billing/**"
+  ]
+}

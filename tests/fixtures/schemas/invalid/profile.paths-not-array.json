@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "stack": "Python 3.12 / FastAPI",
+  "commands": {
+    "test": "pytest -q",
+    "test_targeted": "pytest -q {path}",
+    "lint": "ruff check ."
+  },
+  "codebase_size": "large",
+  "test_maturity": "low",
+  "critical_paths": [
+    "app/auth/**"
+  ],
+  "legacy_paths": "app/**",
+  "incidental_allow": [
+    "poetry.lock"
+  ]
+}

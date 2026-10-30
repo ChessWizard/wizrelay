@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "hub": {
+    "repo": "git@github.com:acme/hub.git",
+    "branch": "main"
+  },
+  "role": "backend",
+  "tracker": {
+    "type": "clickup",
+    "id_prefix": "CU-"
+  },
+  "language": "tr",
+  "base_ref": "origin/main",
+  "prompt_anchor": true,
+  "session_title": true,
+  "fetch_ttl_minutes": "10",
+  "researcher_mention": "@researcher"
+}

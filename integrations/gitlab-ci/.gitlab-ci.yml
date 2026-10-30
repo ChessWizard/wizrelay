@@ -1,0 +1,32 @@
+# wizrelay scope audit for GitLab CI.
+#
+# Copy this job into your project's .gitlab-ci.yml, or include this file:
+#
+#   include:
+#     - remote: 'https://raw.githubusercontent.com/ChessWizard/wizrelay/v1.0.0/integrations/gitlab-ci/.gitlab-ci.yml'
+
+wizrelay-scope:
+  stage: test
+  image: python:3.12-slim
+  variables:
+    WIZRELAY_VERSION: "v1.0.0"
+    # The audit diffs base...HEAD, so the merge base has to exist in the clone.
+    GIT_DEPTH: "50"
+    ON_MISSING_TASK: "skip"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq git >/dev/null
+    - pip install --quiet "git+https://github.com/ChessWizard/wizrelay@${WIZRELAY_VERSION}"
+  script:
+    - BASE="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
+    - git fetch --no-tags --depth="${GIT_DEPTH}" origin "+refs/heads/${BASE}:refs/remotes/origin/${BASE}" || true
+    - |
+      ARGS="audit --base origin/${BASE} --branch ${CI_COMMIT_REF_NAME} --format md"
+      if [ "${ON_MISSING_TASK}" = "fail" ]; then ARGS="${ARGS} --require-task"; fi
+      wizrelay ${ARGS} | tee wizrelay-audit.md
+  artifacts:
+    when: always
+    paths:
+      - wizrelay-audit.md
+    expire_in: 1 week
