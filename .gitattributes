@@ -1,0 +1,6 @@
+* text=auto eol=lf
+
+plugin/bin/wizrelay text eol=lf linguist-language=Shell
+
+*.png binary
+*.ico binary

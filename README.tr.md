@@ -63,6 +63,13 @@ gerektirmez.
 /plugin install wizrelay@wizrelay
 ```
 
+> `wizrelay` **yalnızca** bu reponun kendi marketplace'inden kurulur. Anthropic'in eklenti
+> dizininde listelenmiyor: dizin, komut çalıştıran hook'ları ve skill içindeki satır içi
+> kabuk komutlarını yalnızca Anthropic'in doğruladığı organizasyonlardan kabul ediyor, bu
+> plugin'in kapsam koruması ise ikisine de dayanıyor.
+> [Plugin'i kurmak](docs/tr/04-install-plugin.md) takası açıklıyor. Buradan kurmanın böyle
+> bir sınırı yok.
+
 **Researcher**, ekip başına bir kez, sonra task başına:
 
 ```

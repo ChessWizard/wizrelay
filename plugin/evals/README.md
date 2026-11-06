@@ -2,6 +2,11 @@
 
 Behavioural tests for the skills, run with `claude plugin eval`.
 
+> **Nothing in this directory runs when the plugin is installed or used.** It is a
+> developer-only suite that a maintainer runs by hand with `claude plugin eval`. It
+> downloads nothing, and the plugin itself never invokes any of it. The directory lives
+> under the plugin root only because `claude plugin eval` requires that; see below.
+
 The unit, golden and integration suites prove the deterministic half of this project: the
 CLI, the hook contract, the glob engine. They cannot prove the other half. Whether `ask`
 declines to invent a decision, or `verify` resists fixing the code it is checking, is model

@@ -7,6 +7,31 @@
 `wizrelay`'i kurmak, çalıştığını kontrol etmek ve kapsam korumasının bir oturumda gerçekten
 aktif olduğunu doğrulamak.
 
+## Neden tek kurulum yolu bu repo
+
+`wizrelay`, bu reponun kendi marketplace'inden kurulur. Anthropic'in eklenti dizininde
+listelenmiyor; bu, plugin'de eksik bir şey olmasından değil, dizin tarafındaki bir politika
+sınırından kaynaklanıyor.
+
+Dizin iki şeyi yalnızca Anthropic'in doğruladığı organizasyonlardan kabul ediyor:
+kullanıcının makinesinde komut çalıştıran hook'lar ve skill içindeki satır içi kabuk
+komutları. Bu plugin'in ikisine de ihtiyacı var. Kapsam koruması, bir Python dosyası
+çalıştırıp aktif task'ın kapsamı dışındaki yazmayı reddeden bir `PreToolUse` hook'u; altı
+skill ise task'ın durumunu, Claude talimatı görmeden önce `wizrelay` CLI'ını çalıştırarak
+okuyor.
+
+Bunlar çıkarılmış bir sürüm yine kurulur ve researcher dosyalarını koruyan izin deny
+kurallarını da taşımaya devam eder, çünkü onlar hook değil ayardır. Kaybolan şey, kapsam
+dışı bir düzenlemeyi fiilen durduran kısımdır. Dizin, komut hook'unun yerine prompt hook'u
+koymayı öneriyor; ama prompt hook hiç yerel kod çalıştırmaz: bir modele durumu
+değerlendirip karar döndürmesini söyler. Bu, kapsam glob'larını değerlendiremez,
+`task.json`'ı okuyamaz ve fail-closed olduğu belgelenmemiştir — kontrolü öneri değil
+zorlama katmanı yapan şey ise fail-closed olmasıdır.
+
+Doğrulanmış statü şu an talep bile edilemiyor, yani bu sırada beklenecek bir kuyruk değil,
+kalıcı bir takas. Bu repodan kurmanın bu sınırların hiçbiri yok, tek komut sürüyor ve bu
+kılavuzun her sayfası bunu varsayıyor.
+
 ## Kişisel kurulum, kullanıcı başına bir kez
 
 Her yüzeyin kendi rotası var. Hepsi aynı ayar dosyalarına yazdığı için kullanıcı kapsamında

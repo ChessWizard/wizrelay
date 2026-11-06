@@ -75,6 +75,7 @@ runs:
         PR_BASE: ${{ github.event.pull_request.base.ref }}
         PR_TITLE: ${{ github.event.pull_request.title }}
         HEAD_REF: ${{ github.head_ref }}
+        ACTION_PATH: ${{ github.action_path }}
       run: |
         set -uo pipefail
         BASE="${INPUT_BASE:-$PR_BASE}"
@@ -103,9 +104,9 @@ runs:
           exit 0
         fi
 
-        SKIPPED=$(python -c "import json;print(str(json.load(open('audit.json')).get('skipped', False)).lower())")
+        SKIPPED=$(python "$ACTION_PATH/read_audit.py" skipped audit.json)
         if [ "$SKIPPED" = "true" ]; then
-          REASON=$(python -c "import json;print(json.load(open('audit.json')).get('reason',''))")
+          REASON=$(python "$ACTION_PATH/read_audit.py" reason audit.json)
           {
             echo "### wizrelay scope audit"
             echo
@@ -127,7 +128,7 @@ runs:
             ${BRANCH:+--branch "$BRANCH"} --format md --no-fail || true
         } >> "$GITHUB_STEP_SUMMARY"
 
-        VIOLATIONS=$(python -c "import json;print(json.load(open('audit.json')).get('violations',0))")
+        VIOLATIONS=$(python "$ACTION_PATH/read_audit.py" violations audit.json)
         echo "violations=$VIOLATIONS" >> "$GITHUB_OUTPUT"
         echo "skipped=false" >> "$GITHUB_OUTPUT"
 

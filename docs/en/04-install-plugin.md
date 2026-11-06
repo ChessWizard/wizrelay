@@ -7,6 +7,30 @@
 Installing `wizrelay`, checking that it worked, and confirming that scope protection is
 actually live in a session.
 
+## Why this repository is the only install route
+
+`wizrelay` is installed from this repository's own marketplace. It is not listed in
+Anthropic's plugin directory, and that is a policy boundary on the directory's side rather
+than anything missing from the plugin.
+
+The directory accepts two things only from organizations Anthropic has verified: a hook
+that runs a command on the user's machine, and inline shell inside a skill. This plugin
+needs both. Its scope protection is a `PreToolUse` hook that runs a Python file and denies
+a write outside the active task's scope, and six skills read the task's state by running
+the `wizrelay` CLI before Claude ever sees the instruction.
+
+A version with those removed would still install, and would still carry the permission
+deny rules that protect researcher-owned files, because those are settings rather than
+hooks. What it would lose is the part that actually stops an out-of-scope edit. The
+directory suggests replacing a command hook with a prompt hook, but a prompt hook runs no
+local code: it asks a model to judge the case and return a decision. That cannot evaluate
+the scope globs, cannot read `task.json`, and is not documented to fail closed — and
+failing closed is what makes the check an enforcement layer instead of a suggestion.
+
+Verified status cannot currently be requested, so this is a standing trade-off rather than
+a queue to wait in. Installing from this repository carries none of those limits, takes one
+command, and is what every page in this guide assumes.
+
 ## Personal install, once per user
 
 Each surface has its own route. All of them write the same settings files, so one user-scope

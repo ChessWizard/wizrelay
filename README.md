@@ -65,6 +65,12 @@ hub.
 /plugin install wizrelay@wizrelay
 ```
 
+> This repository's own marketplace is the **only** way to install `wizrelay`. It is not
+> listed in Anthropic's plugin directory, because the directory accepts command hooks and
+> inline shell only from organizations Anthropic has verified, and this plugin's scope
+> protection is built on both. [Install the plugin](docs/en/04-install-plugin.md) explains
+> the trade-off. Installing from here has no such limit.
+
 **Researcher**, once per team, then once per task:
 
 ```

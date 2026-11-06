@@ -9,6 +9,14 @@ solves, the team setup and the full guide, see the
 
 ## Install
 
+From this repository's own marketplace, which is the only route — `wizrelay` is not listed
+in Anthropic's plugin directory. The directory accepts command hooks and inline shell only
+from organizations Anthropic has verified, and this plugin's scope protection is built on
+both: a `PreToolUse` hook that runs a Python file and denies an out-of-scope write, and six
+skills that read the task's state through the `wizrelay` CLI. A build without them would
+install but could no longer stop an out-of-scope edit, so the full plugin is published here
+instead. Nothing about installing from here is limited or provisional.
+
 ```bash
 claude plugin marketplace add ChessWizard/wizrelay
 claude plugin install wizrelay@wizrelay
@@ -60,6 +68,18 @@ timeout blocks the edit rather than letting it through.
 
 The other four add context and warn. They never block.
 
+All five are declared in `hooks/hooks.json`, and every one runs the same shipped file,
+`bin/wizrelay.py`, in exec form — `python3 <file> hook <event>` — so there is no shell and
+no command assembled at run time:
+
+| Event | Timeout | What it does | On failure |
+|---|---|---|---|
+| `SessionStart` | 30 s | Injects the active task's context | continue |
+| `UserPromptSubmit` | 10 s | Adds a one-line reminder of the active task | continue |
+| `PreToolUse` | 15 s | **Denies** an out-of-scope or researcher-owned write | **block** |
+| `Stop` | 20 s | Warns about unanswered questions and unverified criteria | continue |
+| `PreModelSwitch` | 10 s | Warns when the new model is below the task's routing tier | continue |
+
 ## It is silent when unused
 
 In a directory with no `.wizrelay/` and no `wizrelay-hub.json`, the plugin adds no context,
@@ -103,9 +123,48 @@ for every other tracker it writes no endpoint and prints instructions instead, b
 guessed endpoint can point credentials at the wrong host.
 
 On your machine it reads `.wizrelay/`, the task package, and `git status`, `git diff` and
-the current branch. It never reads git author names or email addresses, and never reads a
-credential, a token or an environment variable other than its own `WIZRELAY_*` settings,
-`XDG_CACHE_HOME`, `LOCALAPPDATA`, `CLAUDE_PLUGIN_DATA` and `CLAUDE_CODE_SESSION_ID`.
+the current branch. It never reads git author names or email addresses.
+
+**It reads no credential.** These are the only environment variables it reads anywhere in
+`lib/wizrelay/`, and `tests/unit/test_environment.py` fails if one is added:
+
+| Variable | Read for |
+|---|---|
+| `WIZRELAY_CACHE_DIR` | an explicit cache location |
+| `WIZRELAY_DEBUG` | diagnostics on stderr |
+| `WIZRELAY_PYTHON` | the interpreter the `bin/` launcher should use |
+| `WIZRELAY_TRACKERS_DIR` | an alternative tracker descriptor directory |
+| `XDG_CACHE_HOME` | the cache location on Linux |
+| `LOCALAPPDATA` | the cache location on Windows |
+| `CLAUDE_PLUGIN_DATA` | where the heartbeat file goes, since the plugin root is replaced on update |
+| `CLAUDE_MODEL` | reporting whether the session model matches the task's routing tier |
+| `CLAUDE_CODE_SESSION_ID` | keying that heartbeat to one session |
+
+No token, key, password, `.netrc`, keychain or credential helper is read, and there is no
+code that could: the package ships no HTTP client and every outbound call is `git`, which
+authenticates with your own git configuration exactly as it does when you run it yourself.
+
+Two places mention credentials on purpose, and both **reject** rather than read one:
+
+* `has_embedded_credentials()` in `lib/wizrelay/paths.py` refuses a hub URL of the form
+  `https://user:token@host`, so a token can never reach a config file, a cache directory
+  name or an error message.
+* `wizrelay init` writes a tracker's MCP endpoint only for a tracker whose published
+  endpoint has been verified, and prints instructions for the rest, because a guessed
+  endpoint can point credentials at the wrong host.
+
+The plugin's own manifest declares **no MCP server**, no `userConfig` and no `env`. The one
+entry `init` can write is ClickUp's published endpoint, and it carries exactly two fields:
+
+```json
+{ "clickup": { "type": "http", "url": "https://mcp.clickup.com/mcp" } }
+```
+
+Authentication there is OAuth, performed between you and ClickUp by your client. No token
+passes through wizrelay, and `trackers.mcp_server_config` copies only `type`, `url`,
+`command`, `args` and `headers` — never an `env` block — so no descriptor can forward a
+variable from your environment into that file. `tests/unit/test_environment.py` asserts
+both halves.
 
 It writes `.wizrelay/` in your repository and a cache under your own cache directory. The
 lock file records the task identifier, title, version, the hub commit and file hashes — no
@@ -113,6 +172,22 @@ personal data.
 
 Where a tracker task carries a person's name, that text reaches the session like any other
 task content, and the researcher's package is stored in your team's own repository.
+
+## What ships in `bin/`
+
+Files in a plugin's `bin/` are placed on the Bash tool's `PATH` while the plugin is
+enabled, which is what lets a skill call `wizrelay` as a bare command. Two files are
+there, both plain text, both short, and **neither contains any logic**:
+
+| File | What it is |
+|---|---|
+| `bin/wizrelay` | A 30-line `#!/bin/sh` script. It picks an interpreter (`$WIZRELAY_PYTHON`, then `python3`, then `python`) and `exec`s the file below. Nothing else. |
+| `bin/wizrelay.py` | Puts `lib/` on `sys.path` and calls `wizrelay.cli:main`. Nine statements. |
+
+There is no compiled program, no archive, no generated file and nothing downloaded at
+install time or at run time — the plugin declares no dependencies and installs nothing.
+All of the behaviour lives in readable Python under `lib/wizrelay/`, outside `bin/`, where
+it is covered by the test suite.
 
 ## Security
 
