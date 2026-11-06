@@ -214,7 +214,7 @@ def test_the_documentation_lists_exactly_the_variables_that_are_read(relative: s
     """Both documents make the claim, so both have to stay true as the code changes."""
     text = (REPO / relative).read_text(encoding="utf-8")
 
-    prefixed = {name for name in _ENV_IN_DOCS.findall(text)}
+    prefixed = set(_ENV_IN_DOCS.findall(text))
     expected = {name for name in DOCUMENTED_VARIABLES if name.startswith(("WIZRELAY_", "CLAUDE_"))}
     assert prefixed == expected, (
         f"{relative} lists the wrong WIZRELAY_/CLAUDE_ variables.\n"
