@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-08
+
+### Added
+
+- `/wizrelay:implement` — the step between planning and verifying. It reads `plan.md`,
+  works the unchecked steps in order inside the role's scope, runs each step's own test
+  and checks the step off only once that test has passed. Until now the plan was written
+  and then nothing in the plugin carried it out, so a panel run either stopped after
+  planning or opened a session with no brief, no scope and no record of which step it was
+  on.
+- Questions can say who they are for. `Ask:` (or `Kime:`) in `questions.md` addresses a
+  question, and `@` anywhere in it does the same. A question that names nobody belongs to
+  the project's research lead. A dashboard can then show a question to the person who can
+  answer it instead of to everybody.
+
+### Changed
+
+- `/wizrelay:implement` writes no explanatory comments. Method and field summaries are
+  the exception; a comment that narrates code is a second copy of it that nobody updates.
+
 ## [0.1.1] - 2026-11-08
 
 ### Fixed
