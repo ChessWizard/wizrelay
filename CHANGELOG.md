@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-08
+
+### Fixed
+
+- `/wizrelay:plan` now writes `plan.md` instead of describing a plan and stopping. A
+  session driven headlessly has no turn in which a person can approve, so the run ended
+  with the scaffold untouched and the placeholders still in it. The skill writes when
+  `plan.md` is still the scaffold, and asks only when a real plan with checked-off steps
+  would be replaced.
+- `/wizrelay:plan` takes anything said alongside the command as part of the brief, and
+  says in the plan where it changed a step.
+
 ### Added
 
 - Repository skeleton, governance files, tooling and CI (phase 0).

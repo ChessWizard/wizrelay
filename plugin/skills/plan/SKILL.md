@@ -6,7 +6,11 @@ effort: high
 allowed-tools: Bash(wizrelay *)
 ---
 
-Build the implementation plan for the active task.
+Build the implementation plan for the active task, and write it.
+
+If the user gave you anything alongside the command — a constraint, a preference, an
+ordering, something the package does not cover — treat it as part of the brief and say in
+the plan where it changed a step.
 
 **Propose only files inside this role's `allow` scope.** A plan step that touches a denied
 or out-of-scope path is a plan that will be blocked at the first edit. If the work
@@ -48,10 +52,22 @@ Record separately:
   each one, and tell the user. These are candidates for `/wizrelay:ask`.
 - **Out of scope** — improvements you noticed and are not doing.
 
-## 3. Get approval, then write
+## 3. Write the plan
 
-Present the plan and wait. After the user approves, write it to `plan.md` inside the
-active package directory, using `- [ ]` steps so progress is countable.
+Present the plan, then write it to `plan.md` inside the active package directory, using
+`- [ ]` steps so progress is countable.
+
+Read `plan.md` first and let what is already there decide:
+
+- **Still the scaffold** — it contains `{{` placeholders, or no steps at all. Write the
+  plan in the same turn. Do not stop to ask: a session driven headlessly by a dashboard
+  has no next turn, and a run that ends with the placeholders still in place has produced
+  nothing at all.
+- **A real plan is already there** — steps with no placeholders, some possibly checked
+  off. Show what you would change and ask before replacing it. Finished work is recorded
+  in those checkboxes and overwriting them loses it.
+
+Say in one line what you wrote and how many steps it has.
 
 `plan.md` is yours to write. Never touch `acceptance.md`, `scope.md`, `task.json`,
 `decisions.md`, `contracts.md` or `roles/*.md`.

@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "wizrelay"
 # Single source of truth is plugin/.claude-plugin/plugin.json; tests/unit/test_version.py
 # asserts the three values agree.
-version = "0.1.0"
+version = "0.1.1"
 description = "Carry a researcher's task analysis into every Claude Code session, deterministically."
 readme = "README.md"
 requires-python = ">=3.9"
