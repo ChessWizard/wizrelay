@@ -160,3 +160,25 @@ def test_descriptors_use_the_portable_named_group_syntax() -> None:
     for path in directory.glob("*.json"):
         pattern = json.loads(path.read_text(encoding="utf-8")).get("ref_pattern") or ""
         assert "(?P<" not in pattern, f"{path.name} uses Python-only group syntax"
+
+
+def test_a_missing_catalogue_is_reported_as_a_broken_install(tmp_path, monkeypatch) -> None:
+    """An installation with no catalogue must not blame the hub's tracker setting.
+
+    A `wizrelay` installed as a plain Python package carries `plugin/lib` and nothing
+    else, so the catalogue is left behind — and that copy wins on PATH over the plugin's
+    own. The old message said the hub's tracker type was unknown and offered `none` as the
+    fix, which sends somebody to change a setting that was never wrong.
+    """
+    from wizrelay import trackers
+
+    trackers.descriptor.cache_clear()
+    monkeypatch.setattr(trackers, "catalogue_dir", lambda: None)
+
+    with pytest.raises(UsageError) as caught:
+        trackers.descriptor("clickup")
+
+    message = str(caught.value)
+    assert "no tracker catalogue" in message
+    assert "Unknown tracker type" not in message
+    trackers.descriptor.cache_clear()

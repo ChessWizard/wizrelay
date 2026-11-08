@@ -17,7 +17,7 @@ from __future__ import annotations
 
 # Single source of truth is plugin/.claude-plugin/plugin.json; `make release` writes this
 # value and tests/unit/test_version.py asserts the three copies agree.
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 SCHEMA_VERSION = 1
 """The schema_version every JSON document this project writes carries."""

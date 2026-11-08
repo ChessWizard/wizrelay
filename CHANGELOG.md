@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-09
+
+### Fixed
+
+- An installation with no tracker catalogue now says so instead of reporting the hub's
+  tracker as unknown. `wizrelay` is both a Claude Code plugin and a pip-installable
+  package; the pip distribution carries `plugin/lib` and leaves the catalogue behind, and
+  when that copy comes first on PATH every tracker looks unknown. The old message named
+  the hub's setting and offered `none` as the fix, which sends somebody to change
+  something that was never wrong.
+
 ## [0.2.0] - 2026-11-08
 
 ### Added

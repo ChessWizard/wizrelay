@@ -106,10 +106,28 @@ def descriptor(tracker_type: str) -> dict[str, Any]:
         return dict(_BUILTIN_NONE)
 
     root = catalogue_dir()
-    if root is not None:
-        path = root / f"{name}.json"
-        if path.is_file():
-            return _read(path)
+    if root is None:
+        # Not "this tracker is unknown" — this installation has no catalogue at all, and
+        # saying the former sends people to change a hub setting that was never wrong. It
+        # happens when `wizrelay` is installed as a plain Python package: the distribution
+        # carries `plugin/lib` and nothing else, so the catalogue and the templates are
+        # left behind, and that copy then wins on PATH over the plugin's own.
+        raise UsageError(
+            "This wizrelay installation has no tracker catalogue.",
+            reason=(
+                "plugin/trackers/ could not be found next to the library, so no tracker "
+                "can be read — including the one this hub uses."
+            ),
+            remedy=(
+                "Run the `wizrelay` that ships with the plugin "
+                "(~/.claude/plugins/cache/wizrelay/wizrelay/<version>/bin/wizrelay), or set "
+                "WIZRELAY_TRACKERS_DIR to the catalogue."
+            ),
+        )
+
+    path = root / f"{name}.json"
+    if path.is_file():
+        return _read(path)
 
     raise UsageError(
         f"Unknown tracker type {name!r}.",
@@ -148,7 +166,13 @@ def _read(path: Path) -> dict[str, Any]:
 
 
 def available() -> list[str]:
-    """Tracker types this installation can use, sorted, always including `none`."""
+    """Tracker types this installation can use, sorted, always including `none`.
+
+    An installation with no catalogue answers with the built-in `none` rather than an
+    empty list, because something has to be offered. `descriptor` is where that case is
+    reported, since it is the only one that can tell a missing catalogue from a tracker
+    the hub actually asked for.
+    """
     root = catalogue_dir()
     if root is None:
         return ["none"]
